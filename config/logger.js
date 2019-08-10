@@ -5,14 +5,14 @@ const cluster = require('cluster')
 
 exports['default'] = {
   logger: (api) => {
-    let logger = {transports: []}
+    const logger = { transports: [] }
 
     // console logger
     if (cluster.isMaster) {
       logger.transports.push(function (api, winston) {
         return new (winston.transports.Console)({
           colorize: true,
-          level: 'debug',
+          level: 'info',
           timestamp: function () { return api.id + ' @ ' + new Date().toISOString() }
         })
       })

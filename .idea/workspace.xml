@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="e7ad1d65-a262-4f7e-9a9a-fb4f9497d7d4" name="Default Changelist" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CoverageViewManager">
+    <option name="myElementSize" value="400" />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="phishpi.actionhero" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JsFlowSettings">
+    <service-enabled>true</service-enabled>
+    <exe-path />
+    <other-services-enabled>true</other-services-enabled>
+    <auto-save>true</auto-save>
+  </component>
+  <component name="ProjectId" id="1PCyAsl7FcFJtXDGLSTMgkqV09l" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/node_modules/linq" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.standard" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.standard" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.standard" value="$PROJECT_DIR$/node_modules/standard" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs.jest.jest_package" value="" />
+    <property name="nodejs.mocha.mocha_node_package_dir" value="" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="settings.javascript.linters.eslint" />
+    <property name="standardjs.codestyle.accepted" value="true" />
+    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/public" />
+      <recent name="$PROJECT_DIR$/public/" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Node.js.actionhero">
+    <configuration name="All Tests" type="JavaScriptTestRunnerJest" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="$PROJECT_DIR$/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$" />
+      <jest-options value="--watchAll" />
+      <envs />
+      <scope-kind value="ALL" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" useFirstLineBreakpoints="true">
+      <method v="2" />
+    </configuration>
+    <configuration name="actionhero" type="NodeJSConfigurationType" application-parameters="start" nameIsGenerated="true" path-to-js-file="node_modules/.bin/actionhero" working-dir="$PROJECT_DIR$">
+      <EXTENSION ID="com.jetbrains.nodejs.run.NodeJSStartBrowserRunConfigurationExtension">
+        <browser name="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" with-js-debugger="true" url="http://127.0.0.1:8080" />
+      </EXTENSION>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="JavaScript Debug.actionhero &amp; chrome JavaScript" />
+      <item itemvalue="Jest.All Tests" />
+      <item itemvalue="Node.js.actionhero" />
+      <item itemvalue="Node.js.actionhero &amp; chrome" />
+    </list>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e7ad1d65-a262-4f7e-9a9a-fb4f9497d7d4" name="Default Changelist" comment="" />
+      <created>1565392232424</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1565392232424</updated>
+      <workItem from="1565392233730" duration="75438000" />
+      <workItem from="1565639542169" duration="12082000" />
+      <workItem from="1565720014297" duration="29056000" />
+    </task>
+    <task id="LOCAL-00001" summary="Created really simple prototype with client sliders connected together">
+      <created>1565465838916</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1565465838917</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Small tidy up">
+      <created>1565468504595</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1565468504596</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Added connection icon">
+      <created>1565476815903</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1565476815903</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Colour intensity changes are now made through an action">
+      <created>1565485243563</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1565485243563</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Improved reconnection and change the colour channels to red white and blue">
+      <created>1565494123487</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1565494123487</updated>
+    </task>
+    <task id="LOCAL-00006" summary="change range of colour intensity to 0-255 and some layout changes of the sliders">
+      <created>1565531669675</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1565531669675</updated>
+    </task>
+    <task id="LOCAL-00007" summary="channel inputs are disabled when disconnected">
+      <created>1565532475634</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1565532475634</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Debounce setColourChannel intensity event in client">
+      <created>1565535599147</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1565535599147</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Added lights mode switch">
+      <created>1565545198207</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1565545198207</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Refactors">
+      <created>1565548816713</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1565548816713</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Refactors">
+      <created>1565548993853</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1565548993853</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Refactors">
+      <created>1565549255956</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1565549255956</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Commit local settings for convenience">
+      <created>1565549359119</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1565549359119</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Improved debounce of set colour channel intensity (it didnt actually work)">
+      <created>1565636994001</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1565636994001</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Improved debounce of set colour channel intensity (it didnt actually work)">
+      <created>1565808981516</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1565808981516</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Some tidy up and reduce jquery usage (replace with modern dom methods)">
+      <created>1565814621308</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1565814621308</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Some tidy up and reduce jquery usage (replace with modern dom methods)">
+      <created>1565815328248</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1565815328248</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Some tidy up and reduce jquery usage (replace with modern dom methods)">
+      <created>1565815758549</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1565815758549</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Some tidy up and reduce jquery usage (replace with modern dom methods)">
+      <created>1565816147816</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1565816147817</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Some tidy up and reduce jquery usage (replace with modern dom methods)">
+      <created>1565816410483</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1565816410483</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+    <option name="includedJSSourcePackages">
+      <set>
+        <option value="linq" />
+      </set>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="1">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="roots">
+                    <value>
+                      <list>
+                        <option value="$PROJECT_DIR$" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="2">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:/home/vincent/WebstormProjects/phishpi.actionhero/config" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="OPEN_TABS">
+      <set>
+        <option value="1" />
+      </set>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="Created really simple prototype with client sliders connected together" />
+    <MESSAGE value="Small tidy up" />
+    <MESSAGE value="Added connection icon" />
+    <MESSAGE value="Colour intensity changes are now made throw an action" />
+    <MESSAGE value="Colour intensity changes are now made through an action" />
+    <MESSAGE value="Improved reconnection and change the colour channels to red white and blue" />
+    <MESSAGE value="change range of colour intensity to 0-255 and some layout changes of the sliders" />
+    <MESSAGE value="channel inputs are disabled when disconnected" />
+    <MESSAGE value="Debounce setColourChannel intensity event in client" />
+    <MESSAGE value="Added lights mode switch" />
+    <MESSAGE value="Refactors" />
+    <MESSAGE value="Commit local settings for convenience" />
+    <MESSAGE value="Improved debounce of set colour channel intensity (it didnt actually work)" />
+    <MESSAGE value="Small tidy up&#10;&#10;# Conflicts:&#10;#&#9;public/index.html&#10;#&#9;public/javascript/jquery-3.4.1.min.js" />
+    <MESSAGE value="Some tidy up and reduce jquery usage (replace with modern dom methods)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Some tidy up and reduce jquery usage (replace with modern dom methods)" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/initializers/colourChannels.js</url>
+          <line>34</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/phishpi_actionhero$All_Tests.info" NAME="All Tests Coverage Results" MODIFIED="1565399428850" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="JestJavaScriptTestRunnerCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+  </component>
+</project>

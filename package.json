@@ -7,7 +7,7 @@
     "node": ">=8.0.0"
   },
   "dependencies": {
-    "actionhero": "19.0.1",
+    "actionhero": "latest",
     "ws": "latest",
     "ioredis": "latest"
   },
