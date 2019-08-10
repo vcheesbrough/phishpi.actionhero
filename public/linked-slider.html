@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slider</title>
+    <style type="text/css">
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 15px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .sliderRed::-webkit-slider-thumb {
+            background: red;
+        }
+
+        .sliderRed::-moz-range-thumb {
+            background: red;
+        }
+
+        .sliderBlue::-webkit-slider-thumb {
+            background: blue;
+        }
+
+        .sliderBlue::-moz-range-thumb {
+            background: blue;
+        }
+
+        .sliderGreen::-webkit-slider-thumb {
+            background: #4CAF50;
+        }
+
+        .sliderGreen::-moz-range-thumb {
+            background: #4CAF50;
+        }
+
+    </style>
+    <script type="text/javascript" src="/public/javascript/ActionheroWebsocketClient.min.js"></script>
+    <script type="text/javascript" src="/public/javascript/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript">
+        var client;
+
+        function registerLinkedSlider(client,sliderElement) {
+            let sliderId = sliderElement.id;
+            client.action('createChatRoom', {name: sliderId}, function(data) {
+                client.roomAdd(sliderId);
+            });
+
+            client.on('say', function (data) {
+                if(data.from !== client.id)
+                {
+                    if(data.room === sliderId)
+                    {
+                        sliderElement.value = data.message;
+                    }
+                }
+            });
+
+            return sliderElement.addEventListener('input',
+                function () {
+                    // console.log('input ' + sliderId + ' ' + event.srcElement.value);
+                    client.say(sliderId,event.srcElement.value);
+                }
+            );
+        }
+
+        var boot = function(){
+            client = new ActionheroWebsocketClient();
+
+            client.on('connected',    function(){ console.log('connected!') });
+            client.on('disconnected', function(){ console.log('disconnected :(') });
+
+            client.on('error',        function(error){ console.log('error', error.stack) });
+            client.on('reconnect',    function(){ console.log('reconnect') });
+            client.on('reconnecting', function(){ console.log('reconnecting') });
+
+            // client.on('message',      function(message){ console.log(message) })
+
+            client.on('alert',        function(message){ alert( JSON.stringify(message) ) });
+            client.on('api',          function(message){ alert( JSON.stringify(message) ) });
+
+            client.on('welcome',      function(message){ console.log('welcome: '+JSON.stringify(message)); });
+            client.on('say',          function(message){ console.log('say: '+JSON.stringify(message)); });
+
+            client.connect(function(error, details){
+                if (error) {
+                    console.error(error);
+                } else {
+                    $('#rangeSliderRed,#rangeSliderBlue,#rangeSliderGreen')
+                        .each((index, element) => registerLinkedSlider(client,element));
+                }
+            });
+        }
+
+        var appendMessage = function(message){
+        }
+    </script>
+</head>
+<body onload="boot()">
+<div>
+    <h1>Slider</h1>
+    <input type="range" min="1" max="100" value="50" class="slider sliderRed" id="rangeSliderRed" >
+    <input type="range" min="1" max="100" value="50" class="slider sliderBlue" id="rangeSliderBlue" >
+    <input type="range" min="1" max="100" value="50" class="slider sliderGreen" id="rangeSliderGreen" >
+</div>
+</body>
+</html>
