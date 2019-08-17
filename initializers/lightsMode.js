@@ -12,7 +12,7 @@ module.exports = class LightsModeInitialiser extends ActionHero.Initializer {
 
   async initialize () {
     ActionHero.api.lightsMode = {
-      currentMode: 'off'
+      currentMode: 'auto'
     }
 
     ActionHero.api.chatRoom.addMiddleware({

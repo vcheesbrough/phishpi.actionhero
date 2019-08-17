@@ -31,16 +31,21 @@ export function registerAutoTimeCanvas (client, canvas) {
       .orderBy(schedulePoint => schedulePoint.timeMs)
       .select(schedulePoint => ({
         x: translateTimeMsToX(schedulePoint.timeMs),
-        y: translateIntensityToY(schedulePoint.intensity),
-        schedulePoint: schedulePoint
+        y: translateIntensityToY(schedulePoint.intensity)
       }))
     ctx.beginPath()
     ctx.strokeStyle = colourLookup[(channelValues.key())]
-    const firstCoordinate = coordinates.first()
-    ctx.moveTo(firstCoordinate.x, firstCoordinate.y)
+
+    ctx.moveTo((0 - (canvas.width - coordinates.last().x)), coordinates.last().y)
+
     coordinates
-      .skip(1)
-      .forEach(coordinate => ctx.lineTo(coordinate.x, coordinate.y))
+      .concat([({
+        x: coordinates.first().x + canvas.width,
+        y: coordinates.first().y
+      })])
+      .forEach(coordinate => {
+        ctx.lineTo(coordinate.x, coordinate.y)
+      })
     ctx.lineWidth = 2
     ctx.stroke()
 

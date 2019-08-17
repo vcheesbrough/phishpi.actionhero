@@ -37,7 +37,7 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
         {
           channel: 'red',
           timeMs: parseTimeToMs('09:00:00'),
-          intensity: 0.0
+          intensity: 0.05
         },
         {
           channel: 'blue',
@@ -57,7 +57,7 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
         {
           channel: 'blue',
           timeMs: parseTimeToMs('20:30:00'),
-          intensity: 0.1
+          intensity: 0.09
         },
         {
           channel: 'white',
