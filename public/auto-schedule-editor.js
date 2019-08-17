@@ -1,10 +1,6 @@
 'use strict'
 
-export function registerAutoTimeCanvas (client, canvas) {
-  canvas.style.width = '100%'
-  canvas.style.height = '100%'
-  canvas.width = canvas.offsetWidth
-  canvas.height = canvas.offsetHeight
+export function registerAutoTimeCanvas (client, canvasElement) {
   const topGutter = 20
   const bottomGutter = 50
   const rightGutter = 50
@@ -16,14 +12,28 @@ export function registerAutoTimeCanvas (client, canvas) {
     white: '#000000'
   }
 
+  const resizeCanvas = () => {
+    canvasElement.style.width = '100%'
+    canvasElement.style.height = '100%'
+    canvasElement.width = canvasElement.offsetWidth
+    canvasElement.height = canvasElement.offsetHeight
+  }
+
+  resizeCanvas()
+
+  window.addEventListener('resize', (event) => {
+    resizeCanvas()
+    redrawCanvas()
+  })
+
   const translateTimeMsToX = (timeMs) => {
-    const ratio = 86400000.0 / (canvas.width - rightGutter - leftGutter)
+    const ratio = 86400000.0 / (canvasElement.width - rightGutter - leftGutter)
     return leftGutter + (timeMs / ratio)
   }
 
   const translateIntensityToY = (intensity) => {
-    const ratio = 1.0 / (canvas.height - topGutter - bottomGutter)
-    return canvas.height - ((intensity / ratio) + bottomGutter)
+    const ratio = 1.0 / (canvasElement.height - topGutter - bottomGutter)
+    return canvasElement.height - ((intensity / ratio) + bottomGutter)
   }
 
   const renderChannelSchedule = function (channelValues, ctx) {
@@ -31,17 +41,26 @@ export function registerAutoTimeCanvas (client, canvas) {
       .orderBy(schedulePoint => schedulePoint.timeMs)
       .select(schedulePoint => ({
         x: translateTimeMsToX(schedulePoint.timeMs),
-        y: translateIntensityToY(schedulePoint.intensity)
+        y: translateIntensityToY(schedulePoint.intensity),
+        schedulePoint
       }))
     ctx.beginPath()
     ctx.strokeStyle = colourLookup[(channelValues.key())]
 
-    ctx.moveTo((0 - (canvas.width - coordinates.last().x)), coordinates.last().y)
+    const firstCoordinate = coordinates.first()
+    const lastCoordinate = coordinates.last()
+    const midnightCrossingDeltaTimeMs = firstCoordinate.schedulePoint.timeMs - (0 - lastCoordinate.schedulePoint.timeMs)
+    const midnightCrossingDeltaIntensity = firstCoordinate.schedulePoint.intensity - lastCoordinate.schedulePoint.intensity
+    const midnightCrossingSlopRatio = midnightCrossingDeltaIntensity / midnightCrossingDeltaTimeMs
+
+    ctx.moveTo(
+      translateTimeMsToX(0),
+      translateIntensityToY(firstCoordinate.schedulePoint.intensity - ((firstCoordinate.schedulePoint.timeMs) * midnightCrossingSlopRatio)))
 
     coordinates
       .concat([({
-        x: coordinates.first().x + canvas.width,
-        y: coordinates.first().y
+        x: translateTimeMsToX(86400000),
+        y: translateIntensityToY(lastCoordinate.schedulePoint.intensity + lastCoordinate.schedulePoint.timeMs * midnightCrossingSlopRatio)
       })])
       .forEach(coordinate => {
         ctx.lineTo(coordinate.x, coordinate.y)
@@ -58,16 +77,25 @@ export function registerAutoTimeCanvas (client, canvas) {
     })
   }
 
-  client.on('say', function (data) {
-    const messageObj = JSON.parse(data.message)
-    if (messageObj.type === 'notifyAutoScheduleChange') {
-      console.log(messageObj)
-      const ctx = canvas.getContext('2d')
-      Enumerable.from(messageObj.schedule)
+  let currentSchedule
+
+  const redrawCanvas = () => {
+    if (currentSchedule) {
+      const ctx = canvasElement.getContext('2d')
+      Enumerable.from(currentSchedule)
         .groupBy(element => element.channel)
         .forEach(group => {
           renderChannelSchedule(group, ctx)
         })
+    }
+  }
+
+  client.on('say', function (data) {
+    const messageObj = JSON.parse(data.message)
+    if (messageObj.type === 'notifyAutoScheduleChange') {
+      console.log(messageObj)
+      currentSchedule = messageObj.schedule
+      redrawCanvas()
     }
   })
 };
