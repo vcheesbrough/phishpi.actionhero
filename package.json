@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "actionhero": "latest",
-    "ws": "latest",
-    "ioredis": "latest"
+    "ioredis": "latest",
+    "ws": "latest"
   },
   "devDependencies": {
     "jest": "latest",

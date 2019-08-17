@@ -1,5 +1,7 @@
 'use strict'
 
+import { debounce } from './debounce.js'
+
 export function registerColourChannelInput (client, sliderElement, debounceDelay, colourChannel) {
   sliderElement.disabled = false
   client.on('disconnected', () => sliderElement.disabled = true)
@@ -14,29 +16,9 @@ export function registerColourChannelInput (client, sliderElement, debounceDelay
       }
     }
   })
-  let timeout
-  let lastSetColourChannelParams
-
-  const doSetColourChannel = (setColourChannelParams) => {
-    if (lastSetColourChannelParams !== setColourChannelParams) {
-      lastSetColourChannelParams = setColourChannelParams
-      client.action('setColourChannel', setColourChannelParams)
-    }
-  }
-  let timerColourChannelParams
-  const debounceSetColourChannel = function (setColourChannelParams, debounceTime) {
-    timerColourChannelParams = setColourChannelParams
-    if (timeout === undefined) {
-      doSetColourChannel(timerColourChannelParams)
-      timeout = setTimeout(() => {
-        doSetColourChannel(timerColourChannelParams)
-        timeout = undefined
-      }, debounceTime)
-    }
-  }
 
   return sliderElement.addEventListener('input', (event) => {
     const setColourChannelParams = { channel: colourChannel, intensity: event.srcElement.value }
-    debounceSetColourChannel(setColourChannelParams, debounceDelay)
+    debounce(() => client.action('setColourChannel', setColourChannelParams), debounceDelay)
   })
 }
