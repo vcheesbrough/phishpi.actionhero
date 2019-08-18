@@ -5,24 +5,15 @@ export function registerAutoTimeCanvas (client, containingElement) {
   const bottomGutter = 50
   const rightGutter = 20
   const leftGutter = 80
-  const nodeRadius = 5
   const mouseAxisTickLength = 20
   const mouseAxisTickWidth = 10
   const mouseAxisTickColour = '#abaaaa'
   const mouseAxisTextColour = '#6a6a6a'
   const mouseAxisTextFont = '20px sans-serif'
-  const mouseFudgeFactor = nodeRadius + 10
-  const nodeFillColour = 'white'
-  const highlightBlurLevel = 10
-  const highlightBlueColour = 'gray'
-  const colourLookup = {
-    red: '#ff0000',
-    blue: '#0008ff',
-    white: '#000000'
-  }
+  const mouseFudgeFactor = 10
   const axisColour = '#d9d9d9'
 
-  const createCanvas = (canvasId, zIndex) => {
+  const createCanvasAndAddToContainingElement = (canvasId, zIndex) => {
     const canvas = document.createElement("canvas");
     canvas.id = canvasId;
     canvas.style.position = 'absolute'
@@ -35,25 +26,130 @@ export function registerAutoTimeCanvas (client, containingElement) {
     return canvas
   }
 
+  class Channel {
+    #name
+    #canvas
+    #highlighted = false
+    #nodes
+    #schedule
+    #needsDraw = true
+    static nodeRadius = 5
+    static nodeFillColour = 'white'
+    static highlightBlurLevel = 10
+    static highlightBlueColour = 'gray'
+    static colourLookup = {
+      red: '#ff0000',
+      blue: '#0008ff',
+      white: '#000000'
+    }
+
+    constructor(channelName) {
+      this.#name = channelName
+      this.#canvas = createCanvasAndAddToContainingElement(this.#name + 'Canvas', 30)
+    }
+
+    get name() {
+      return this.#name
+    }
+
+    set highlighted(isHighlighted) {
+      if(this.#highlighted !== isHighlighted) {
+        this.#highlighted = isHighlighted
+        this.#needsDraw = true
+      }
+    }
+
+    get nodes() {
+      if(!this.#nodes) {
+        const ctx = this.#canvas.getContext('2d')
+        this.#needsDraw = true
+        this.#nodes = this.#schedule
+          .orderBy(scheduleItem => scheduleItem.timeMs)
+          .select(scheduleItem => ({
+            coordinate: {
+              x:translateTimeMsToX(ctx, scheduleItem.timeMs),
+              y:translateIntensityToY(ctx, scheduleItem.intensity)
+            },
+            schedulePoint: scheduleItem
+          }))
+          .toArray()
+      }
+      return this.#nodes
+    }
+
+    set schedule(schedule) {
+      this.#needsDraw = true
+      this.#schedule = schedule
+      this.#nodes = undefined
+    }
+
+    onResize() {
+      this.#needsDraw = true
+      resizeCanvas(this.#canvas)
+      this.#nodes = undefined
+    }
+
+    drawIfNeeded() {
+      if(this.#needsDraw && this.#schedule) {
+        const ctx = this.#canvas.getContext('2d')
+
+        this.#canvas.style.zIndex = this.#highlighted ? '35' : '30'
+        ctx.shadowBlur = this.#highlighted ? Channel.highlightBlurLevel : 0
+        ctx.shadowColor = Channel.highlightBlueColour
+
+        ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height)
+        ctx.beginPath()
+        ctx.strokeStyle = Channel.colourLookup[(this.#name)]
+
+        const firstNode = this.nodes[0]
+        const lastNode = this.nodes[this.nodes.length-1]
+        const midnightCrossingDeltaTimeMs = firstNode.schedulePoint.timeMs - (0 - lastNode.schedulePoint.timeMs)
+        const midnightCrossingDeltaIntensity = firstNode.schedulePoint.intensity - lastNode.schedulePoint.intensity
+        const midnightCrossingSlopRatio = midnightCrossingDeltaIntensity / midnightCrossingDeltaTimeMs
+
+        ctx.moveTo(
+          translateTimeMsToX(ctx, 0),
+          translateIntensityToY(ctx, firstNode.schedulePoint.intensity - ((firstNode.schedulePoint.timeMs) * midnightCrossingSlopRatio)))
+
+        const coordinates = Enumerable.from(this.nodes)
+          .select(node => node.coordinate)
+        coordinates
+          .concat([({
+            x: translateTimeMsToX(ctx, 86400000),
+            y: translateIntensityToY(ctx, lastNode.schedulePoint.intensity + lastNode.schedulePoint.timeMs * midnightCrossingSlopRatio)
+          })])
+          .forEach(coordinate => {
+            ctx.lineTo(coordinate.x, coordinate.y)
+          })
+        ctx.lineWidth = 2
+        ctx.stroke()
+
+        ctx.fillStyle = this.#highlighted ? Channel.colourLookup[(this.#name)] : Channel.nodeFillColour
+        coordinates.forEach(coordinate => {
+          ctx.beginPath()
+          ctx.arc(coordinate.x, coordinate.y, Channel.nodeRadius, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.stroke()
+        })
+        this.#needsDraw = false
+      }
+    }
+  }
+
   const resizeCanvas = (canvas) => {
     canvas.width = containingElement.clientWidth
     canvas.height = containingElement.clientHeight
   }
 
-  const channelData = {}
+  const channels = {}
 
   Enumerable.from(['red', 'blue', 'white'])
-    .select((channel, index) =>
-      ({
-        channel: channel,
-        canvas: createCanvas(channel+'Canvas', 30),
-        highlighted: false
-      })
-    )
-    .forEach(element => channelData[element.channel] = element)
+    .forEach(channelName => {
+      channels[channelName] = new Channel(channelName)
+    })
 
-  const axisCanvas = createCanvas('axisCanvas',2)
-  const mouseCanvas = createCanvas('mouseCanvas',1)
+  const axisCanvas = createCanvasAndAddToContainingElement('axisCanvas',2)
+  const mouseCanvas = createCanvasAndAddToContainingElement('mouseCanvas',1)
 
   const convertMouseEventCoordinates = (event) => {
     let x = event.offsetX
@@ -121,7 +217,7 @@ export function registerAutoTimeCanvas (client, containingElement) {
       const aProps = Object.getOwnPropertyNames(a)
       const bProps = Object.getOwnPropertyNames(b)
 
-      if (aProps.length != bProps.length) {
+      if (aProps.length !== bProps.length) {
         return false;
       }
 
@@ -146,7 +242,7 @@ export function registerAutoTimeCanvas (client, containingElement) {
       window.requestAnimationFrame(() => {
         const ctx = mouseCanvas.getContext('2d')
         ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height)
-        Enumerable.from(channelData)
+        Enumerable.from(channels)
           .forEach(pair => {
             pair.value.highlighted = false
           })
@@ -158,7 +254,7 @@ export function registerAutoTimeCanvas (client, containingElement) {
     if(! isEquivalent(lastMouseCoordinate, coordinate) || lastMouseCoordinate === undefined) {
       window.requestAnimationFrame(() => {
 
-        const firstMatchingNode = Enumerable.from(channelData)
+        const firstMatchingNode = Enumerable.from(channels)
           .selectMany(pair => pair.value.nodes)
           .firstOrDefault(channelNode => {
             if(channelNode.coordinate.x - mouseFudgeFactor <= coordinate.x && channelNode.coordinate.x + mouseFudgeFactor >= coordinate.x) {
@@ -169,14 +265,14 @@ export function registerAutoTimeCanvas (client, containingElement) {
             return false;
           })
 
-        const stickyCoordinate = firstMatchingNode ? {x: firstMatchingNode.x, y: firstMatchingNode.y} : coordinate
+        const stickyCoordinate = firstMatchingNode ? firstMatchingNode.coordinate : coordinate
         const intensity = firstMatchingNode ? firstMatchingNode.schedulePoint.intensity : undefined
         const timeMs = firstMatchingNode ? firstMatchingNode.schedulePoint.timeMs : undefined
 
         drawMouseTicks(mouseCanvas.getContext('2d'), stickyCoordinate, intensity, timeMs)
-        Enumerable.from(channelData)
+        Enumerable.from(channels)
           .forEach(pair => {
-            pair.value.highlighted = firstMatchingNode && firstMatchingNode.schedulePoint.channel == pair.key
+            pair.value.highlighted = firstMatchingNode && firstMatchingNode.schedulePoint.channel === pair.key
           })
         drawAllChannels()
       })
@@ -184,15 +280,11 @@ export function registerAutoTimeCanvas (client, containingElement) {
     lastMouseCoordinate = coordinate
   }
 
-
   const drawAllChannels = () => {
-    if(currentSchedule)
-    {
-      Enumerable.from(channelData)
-        .forEach(pair => {
-          renderSingleChannelSchedule(pair.key)
-        })
-    }
+    Enumerable.from(channels)
+      .forEach(pair => {
+        pair.value.drawIfNeeded()
+      })
   }
 
   const translateXToTimeMs = (ctx, x) => {
@@ -215,72 +307,6 @@ export function registerAutoTimeCanvas (client, containingElement) {
     return Math.floor(ctx.canvas.clientHeight - ((intensity / ratio) + bottomGutter))
   }
 
-  const updateAllChannelCoordinates = () => {
-    if(currentSchedule) {
-      Enumerable.from(currentSchedule)
-        .groupBy(element => element.channel)
-        .forEach(channelValues => {
-          const ctx = channelData[channelValues.key()].canvas.getContext('2d')
-          channelData[channelValues.key()].nodes = channelValues
-            .orderBy(schedulePoint => schedulePoint.timeMs)
-            .select(schedulePoint => ({
-              coordinate: {
-                x:translateTimeMsToX(ctx, schedulePoint.timeMs),
-                y:translateIntensityToY(ctx, schedulePoint.intensity)
-              },
-              schedulePoint
-            }))
-            .toArray()
-        })
-    }
-  }
-
-  const renderSingleChannelSchedule = function (channel) {
-    const nodes = channelData[channel].nodes
-    const ctx = channelData[channel].canvas.getContext('2d')
-
-    channelData[channel].canvas.style.zIndex = channelData[channel].highlighted ? '35' : '30'
-    ctx.shadowBlur = channelData[channel].highlighted ? highlightBlurLevel : 0
-    ctx.shadowColor = highlightBlueColour
-
-    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height)
-    ctx.beginPath()
-    ctx.strokeStyle = colourLookup[(channel)]
-
-    const firstNode = nodes[0]
-    const lastNode = nodes[nodes.length-1]
-    const midnightCrossingDeltaTimeMs = firstNode.schedulePoint.timeMs - (0 - lastNode.schedulePoint.timeMs)
-    const midnightCrossingDeltaIntensity = firstNode.schedulePoint.intensity - lastNode.schedulePoint.intensity
-    const midnightCrossingSlopRatio = midnightCrossingDeltaIntensity / midnightCrossingDeltaTimeMs
-
-    ctx.moveTo(
-      translateTimeMsToX(ctx, 0),
-      translateIntensityToY(ctx, firstNode.schedulePoint.intensity - ((firstNode.schedulePoint.timeMs) * midnightCrossingSlopRatio)))
-
-    const coordinates = Enumerable.from(nodes)
-      .select(node => node.coordinate)
-    coordinates
-      .concat([({
-        x: translateTimeMsToX(ctx, 86400000),
-        y: translateIntensityToY(ctx, lastNode.schedulePoint.intensity + lastNode.schedulePoint.timeMs * midnightCrossingSlopRatio)
-      })])
-      .forEach(coordinate => {
-        ctx.lineTo(coordinate.x, coordinate.y)
-      })
-    ctx.lineWidth = 2
-    ctx.stroke()
-
-    ctx.fillStyle = channelData[channel].highlighted ? colourLookup[(channel)] : nodeFillColour
-    coordinates.forEach(coordinate => {
-      ctx.beginPath()
-      ctx.arc(coordinate.x, coordinate.y, nodeRadius, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.stroke()
-    })
-  }
-
-  let currentSchedule
-
   const drawAxis = () => {
     const ctx = axisCanvas.getContext('2d')
     ctx.lineWidth = 1
@@ -301,8 +327,11 @@ export function registerAutoTimeCanvas (client, containingElement) {
     const messageObj = JSON.parse(data.message)
     if (messageObj.type === 'notifyAutoScheduleChange') {
       console.info('Received auto schedule update',messageObj)
-      currentSchedule = messageObj.schedule
-      updateAllChannelCoordinates()
+      Enumerable.from(messageObj.schedule)
+        .groupBy(element => element.channel)
+        .forEach(oneChannelSchedule => {
+          channels[oneChannelSchedule.key()].schedule = oneChannelSchedule
+        })
       drawAllChannels()
     }
   })
@@ -310,11 +339,9 @@ export function registerAutoTimeCanvas (client, containingElement) {
   const onResize = () => {
     resizeCanvas(axisCanvas)
     resizeCanvas(mouseCanvas)
-    Enumerable.from(channelData).forEach(pair => {
-      resizeCanvas(pair.value.canvas)
-    })
+    Enumerable.from(channels)
+      .forEach(pair => pair.value.onResize())
     drawAxis()
-    updateAllChannelCoordinates()
     drawAllChannels()
   }
 
