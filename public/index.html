@@ -95,6 +95,7 @@
     <script language="JavaScript" src="Grouped-Toggle-Buttons-jQuery-multibutton/jquery.multibutton.js" type="text/javascript"></script>
     <link href="Grouped-Toggle-Buttons-jQuery-multibutton/jquery.multibutton.css" rel="stylesheet" type="text/css">
     <script src="linq.js" type="text/javascript"></script>
+    <script src="https://momentjs.com/downloads/moment.min.js"></script>
 
     <script type="text/javascript">
         function registerLinkedModeSwitch(client,onModeChangeFunction) {
@@ -142,15 +143,15 @@
                 setConnectedIconColour('green');
                 if(firstConnection)
                 {
-                    AutoScheduleEditor.registerAutoTimeCanvas(client,document.querySelector('#timeCanvas'))
+                  AutoScheduleEditor.registerAutoTimeCanvas(client,document.querySelector('#autoPage'))
 
-                    document.querySelectorAll('#rangeSliderRed, #numberRed, #rangeSliderBlue, #numberBlue, #rangeSliderWhite, #numberWhite')
-                      .forEach(element => LinkedColourChannelInput.registerColourChannelInput(client, element,colourChannelDebounceTimeMs , element.getAttribute("data-colourChannel")));
+                  document.querySelectorAll('#rangeSliderRed, #numberRed, #rangeSliderBlue, #numberBlue, #rangeSliderWhite, #numberWhite')
+                    .forEach(element => LinkedColourChannelInput.registerColourChannelInput(client, element,colourChannelDebounceTimeMs , element.getAttribute("data-colourChannel")));
 
-                    registerLinkedModeSwitch(client, mode => {
-                        document.querySelector('#channelsPage').style.display = mode === 'manual' ? 'block' : 'none'
-                        document.querySelector('#autoPage').style.display = mode === 'auto' ? 'block' : 'none'
-                    });
+                  registerLinkedModeSwitch(client, mode => {
+                    document.querySelector('#channelsPage').style.display = mode === 'manual' ? 'block' : 'none'
+                    document.querySelector('#autoPage').style.display = mode === 'auto' ? 'block' : 'none'
+                  });
                     firstConnection = false;
                 }
             });
@@ -213,7 +214,6 @@
         </div>
 
         <div id="autoPage" class="pagePanel">
-            <canvas id="timeCanvas" style="border: 1px solid lightgrey"></canvas>
         </div>
     </div>
 </body>
