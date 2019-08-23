@@ -127,7 +127,7 @@
 
         const setConnectedIconColour = (colour) => document.querySelector('#connectedIcon').style.color = colour
 
-        const colourChannelDebounceTimeMs = 100
+        const debounceTimeMs = 100
         document.addEventListener('DOMContentLoaded', function ()  {
             const client = new ActionheroWebsocketClient();
 
@@ -143,10 +143,10 @@
                 setConnectedIconColour('green');
                 if(firstConnection)
                 {
-                  AutoScheduleEditor.registerAutoTimeCanvas(client,document.querySelector('#autoPage'))
+                  AutoScheduleEditor.registerAutoTimeCanvas(client,document.querySelector('#autoPage'), debounceTimeMs)
 
                   document.querySelectorAll('#rangeSliderRed, #numberRed, #rangeSliderBlue, #numberBlue, #rangeSliderWhite, #numberWhite')
-                    .forEach(element => LinkedColourChannelInput.registerColourChannelInput(client, element,colourChannelDebounceTimeMs , element.getAttribute("data-colourChannel")));
+                    .forEach(element => LinkedColourChannelInput.registerColourChannelInput(client, element,debounceTimeMs , element.getAttribute("data-colourChannel")));
 
                   registerLinkedModeSwitch(client, mode => {
                     document.querySelector('#channelsPage').style.display = mode === 'manual' ? 'block' : 'none'

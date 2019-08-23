@@ -1,3 +1,5 @@
+'use strict'
+
 import * as AutoScheduleUtils from './auto-schedule-utils.js'
 
 export class AutoScheduleMouseController {
@@ -42,16 +44,18 @@ export class AutoScheduleMouseController {
           timeMs = this.#draggedNode.channel.nodes[this.#draggedNode.index-1].schedulePoint.timeMs
         }
       }
-      if(this.#draggedNode.index < this.#draggedNode.channel.nodes.length -2) {
+      if(this.#draggedNode.index <= this.#draggedNode.channel.nodes.length -2) {
         if(timeMs > this.#draggedNode.channel.nodes[this.#draggedNode.index+1].schedulePoint.timeMs) {
           timeMs = this.#draggedNode.channel.nodes[this.#draggedNode.index+1].schedulePoint.timeMs
         }
       }
-      node.schedulePoint.intensity = intensity
-      node.schedulePoint.timeMs = timeMs
 
-      const schedule = this.#draggedNode.channel.schedule
-      this.#draggedNode.channel.schedule = schedule
+      const schedule = Enumerable.from(this.#draggedNode.channel.schedule).toArray()
+      schedule[this.#draggedNode.index] = {
+        intensity: intensity,
+        timeMs: timeMs
+      }
+      this.#draggedNode.channel.setSchedule(Enumerable.from(schedule),true)
 
     }
   }

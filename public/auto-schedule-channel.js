@@ -1,3 +1,5 @@
+'use strict'
+
 import * as AutoScheduleUtils from './auto-schedule-utils.js'
 
 export class AutoScheduleChannel {
@@ -8,6 +10,7 @@ export class AutoScheduleChannel {
   #schedule
   #needsDraw = true
   #dimensions
+  #containerElement
   static nodeRadius = 5
   static nodeFillColour = 'white'
   static highlightBlurLevel = 10
@@ -19,9 +22,10 @@ export class AutoScheduleChannel {
   }
 
   constructor (channelName, containerElement, dimensions) {
+    this.#containerElement = containerElement
     this.#name = channelName
     this.#dimensions = dimensions
-    this.#canvas = AutoScheduleUtils.createCanvasAndAddToContainingElement(this.#name + 'Canvas', 30, containerElement)
+    this.#canvas = AutoScheduleUtils.createCanvasAndAddToContainingElement(this.#name + 'Canvas', 30, this.#containerElement)
   }
 
   get name () {
@@ -56,12 +60,32 @@ export class AutoScheduleChannel {
     }
     return this.#nodes
   }
+  setSchedule(schedule,fireEvents) {
+    if (this.#schedule && !this.#schedule.sequenceEqual(schedule, element => JSON.stringify(element)) || !this.#schedule) {
+      this.#needsDraw = true
+      const oldSchedule = this.#schedule
+      this.#schedule = schedule
+      this.#nodes = undefined
+      this.drawIfNeeded()
+      if(fireEvents)
+      {
+        this.#containerElement.dispatchEvent(new CustomEvent('schedulechange', {
+          detail: {
+            channel: this.name,
+            schedule: this.#schedule
+          }
+        }))
 
-  set schedule (schedule) {
-    this.#needsDraw = true
-    this.#schedule = schedule
-    this.#nodes = undefined
-    this.drawIfNeeded()
+      }
+    }
+  }
+
+  addScheduleChangeListener(func) {
+    this.#containerElement.addEventListener('schedulechange',customEvent => {
+      if(this.name === customEvent.detail.channel) {
+        func(customEvent.detail.channel,customEvent.detail.schedule)
+      }
+    })
   }
 
   get schedule () {

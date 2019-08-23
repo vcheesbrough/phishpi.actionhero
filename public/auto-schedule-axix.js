@@ -1,3 +1,5 @@
+'use strict'
+
 import * as AutoScheduleUtils from './auto-schedule-utils.js'
 
 export class AutoScheduleAxis {

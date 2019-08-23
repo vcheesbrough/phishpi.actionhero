@@ -3,8 +3,9 @@
 import { AutoScheduleChannel } from './auto-schedule-channel.js'
 import { AutoScheduleAxis } from './auto-schedule-axix.js'
 import { AutoScheduleMouseController } from './auto-schedule-mouse-controller.js'
+import { debounce } from './debounce.js'
 
-export function registerAutoTimeCanvas (client, containingElement) {
+export function registerAutoTimeCanvas (client, containingElement, debounceDelay) {
   const chartAreaDimensions = {
     topGutter: 20,
     bottomGutter:  50,
@@ -17,6 +18,12 @@ export function registerAutoTimeCanvas (client, containingElement) {
   Enumerable.from(['red', 'blue', 'white'])
     .forEach(channelName => {
       channels[channelName] = new AutoScheduleChannel(channelName, containingElement, chartAreaDimensions)
+      channels[channelName].addScheduleChangeListener((channel,schedule) => {
+          debounce(() => client.action('setSchedule', {
+            channel: channel,
+            schedule: schedule.toArray()
+          }), debounceDelay)
+      })
     })
 
   const axis = new AutoScheduleAxis(containingElement,chartAreaDimensions)
@@ -31,8 +38,8 @@ export function registerAutoTimeCanvas (client, containingElement) {
     const messageObj = JSON.parse(data.message)
     if (messageObj.type === 'notifyAutoScheduleChange') {
       console.info('Received auto schedule update',messageObj)
-      channels[messageObj.channel].schedule = Enumerable.from(messageObj.schedule)
-        .orderBy(scheduleElement => scheduleElement.timeMs)
+      channels[messageObj.channel].setSchedule(Enumerable.from(messageObj.schedule)
+        .orderBy(scheduleElement => scheduleElement.timeMs),false)
     }
   })
 

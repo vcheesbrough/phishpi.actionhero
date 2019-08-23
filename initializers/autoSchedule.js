@@ -1,5 +1,6 @@
 'use strict'
 const ActionHero = require('actionhero')
+const Enumerable = require('linq/linq.js');
 
 const parseTimeToMs = (s) => {
   const re = /(\d{2}):(\d{2}):(\d{2})(\.(\d{3}))?/
@@ -23,56 +24,58 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
 
   async initialize () {
     ActionHero.api.autoSchedule = {
-      red: [
-        {
-          timeMs: parseTimeToMs('08:00:00'),
-          intensity: 0
-        },
-        {
-          timeMs: parseTimeToMs('08:30:00'),
-          intensity: 0.2
-        },
-        {
-          timeMs: parseTimeToMs('09:00:00'),
-          intensity: 0.05
-        }
-      ],
-      blue: [
-        {
-          timeMs: parseTimeToMs('09:00:00'),
-          intensity: 0.1
-        },
-        {
-          timeMs: parseTimeToMs('10:00:00'),
-          intensity: 0.5
-        },
-        {
-          timeMs: parseTimeToMs('20:00:00'),
-          intensity: 0.5
-        },
-        {
-          timeMs: parseTimeToMs('20:30:00'),
-          intensity: 0.09
-        },
-      ],
-      white: [
-        {
-          timeMs: parseTimeToMs('08:45:00'),
-          intensity: 0
-        },
-        {
-          timeMs: parseTimeToMs('10:00:00'),
-          intensity: 1
-        },
-        {
-          timeMs: parseTimeToMs('20:00:00'),
-          intensity: 1
-        },
-        {
-          timeMs: parseTimeToMs('21:00:00'),
-          intensity: 0
-        }
-      ]
+      schedule: {
+        red: [
+          {
+            timeMs: parseTimeToMs('08:00:00'),
+            intensity: 0
+          },
+          {
+            timeMs: parseTimeToMs('08:30:00'),
+            intensity: 0.2
+          },
+          {
+            timeMs: parseTimeToMs('09:00:00'),
+            intensity: 0.05
+          }
+        ],
+        blue: [
+          {
+            timeMs: parseTimeToMs('09:00:00'),
+            intensity: 0.1
+          },
+          {
+            timeMs: parseTimeToMs('10:00:00'),
+            intensity: 0.5
+          },
+          {
+            timeMs: parseTimeToMs('20:00:00'),
+            intensity: 0.5
+          },
+          {
+            timeMs: parseTimeToMs('20:30:00'),
+            intensity: 0.09
+          },
+        ],
+        white: [
+          {
+            timeMs: parseTimeToMs('08:45:00'),
+            intensity: 0
+          },
+          {
+            timeMs: parseTimeToMs('10:00:00'),
+            intensity: 1
+          },
+          {
+            timeMs: parseTimeToMs('20:00:00'),
+            intensity: 1
+          },
+          {
+            timeMs: parseTimeToMs('21:00:00'),
+            intensity: 0
+          }
+        ]
+      }
     }
 
     ActionHero.api.chatRoom.addMiddleware({
@@ -84,6 +87,13 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
       }
     })
 
+    ActionHero.api.autoSchedule.setSchedule = async (channel, schedule, changedBy) => {
+      if(!Enumerable.from(schedule).sequenceEqual(ActionHero.api.autoSchedule.schedule[channel],element => JSON.stringify(element))) {
+        ActionHero.api.autoSchedule.schedule[channel] = schedule
+        await ActionHero.api.autoSchedule.sendScheduleUpdate(channel,changedBy)
+      }
+    }
+
     ActionHero.api.autoSchedule.sendScheduleUpdate = async (channel, changedBy) => {
       await ActionHero.api.chatRoom.broadcast(
         {},
@@ -91,8 +101,8 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
         JSON.stringify({
           type: 'notifyAutoScheduleChange',
           channel: channel,
-          schedule: ActionHero.api.autoSchedule[channel],
-          changedBy: 0
+          schedule: ActionHero.api.autoSchedule.schedule[channel],
+          changedBy: changedBy
         }))
     }
   }
