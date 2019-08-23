@@ -63,12 +63,10 @@ export class AutoScheduleMouseController {
     if(matchingNode) {
       this.#containingElement.addEventListener('pointermove', this.#onDrag)
     }
-    console.log(event)
   }
 
   #onPointerUp = (event) => {
     this.#endDrag()
-    console.log(event)
   }
 
   #endDrag = () => {

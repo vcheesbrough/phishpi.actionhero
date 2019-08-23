@@ -89,7 +89,7 @@ export class AutoScheduleChannel {
 
       const firstNode = this.nodes[0]
       const lastNode = this.nodes[this.nodes.length - 1]
-      const midnightCrossingDeltaTimeMs = firstNode.schedulePoint.timeMs - (0 - lastNode.schedulePoint.timeMs)
+      const midnightCrossingDeltaTimeMs = firstNode.schedulePoint.timeMs - (0 - (86400000-lastNode.schedulePoint.timeMs))
       const midnightCrossingDeltaIntensity = firstNode.schedulePoint.intensity - lastNode.schedulePoint.intensity
       const midnightCrossingSlopRatio = midnightCrossingDeltaIntensity / midnightCrossingDeltaTimeMs
 
@@ -102,7 +102,7 @@ export class AutoScheduleChannel {
       coordinates
         .concat([({
           x: AutoScheduleUtils.translateTimeMsToX(ctx, 86400000, this.#dimensions),
-          y: AutoScheduleUtils.translateIntensityToY(ctx, lastNode.schedulePoint.intensity + lastNode.schedulePoint.timeMs * midnightCrossingSlopRatio, this.#dimensions)
+          y: AutoScheduleUtils.translateIntensityToY(ctx, lastNode.schedulePoint.intensity + (86400000-lastNode.schedulePoint.timeMs) * midnightCrossingSlopRatio, this.#dimensions)
         })])
         .forEach(coordinate => {
           ctx.lineTo(coordinate.x, coordinate.y)
