@@ -11,7 +11,7 @@ export function registerColourChannelInput (client, sliderElement, debounceDelay
     const messageObj = JSON.parse(data.message)
     if (messageObj.type === 'notifyChannelIntensity') {
       if (messageObj.channel === colourChannel) {
-        console.log('Received channel update ' + data.message)
+        console.log('Received channel update ',messageObj)
         sliderElement.value = messageObj.intensity
       }
     }

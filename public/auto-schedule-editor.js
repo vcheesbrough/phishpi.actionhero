@@ -31,12 +31,8 @@ export function registerAutoTimeCanvas (client, containingElement) {
     const messageObj = JSON.parse(data.message)
     if (messageObj.type === 'notifyAutoScheduleChange') {
       console.info('Received auto schedule update',messageObj)
-      Enumerable.from(messageObj.schedule)
-        .groupBy(element => element.channel)
-        .forEach(oneChannelSchedule => {
-          channels[oneChannelSchedule.key()].schedule = oneChannelSchedule
-            .orderBy(scheduleElement => scheduleElement.timeMs)
-        })
+      channels[messageObj.channel].schedule = Enumerable.from(messageObj.schedule)
+        .orderBy(scheduleElement => scheduleElement.timeMs)
     }
   })
 

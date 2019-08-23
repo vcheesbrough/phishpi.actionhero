@@ -122,7 +122,7 @@ export class AutoScheduleMouseController {
         this.#autoScheduleAxis.drawMouseTicks(stickyCoordinate, intensity, timeMs)
         Enumerable.from(this.#channels)
           .forEach(channel => {
-            channel.highlighted = firstMatchingNode && firstMatchingNode.channel.nodes[firstMatchingNode.index].schedulePoint.channel === channel.name
+            channel.highlighted = firstMatchingNode && firstMatchingNode.channel.name === channel.name
           })
       })
     }

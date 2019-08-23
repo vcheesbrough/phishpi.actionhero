@@ -23,59 +23,52 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
 
   async initialize () {
     ActionHero.api.autoSchedule = {
-      schedule: [
+      red: [
         {
-          channel: 'red',
           timeMs: parseTimeToMs('08:00:00'),
           intensity: 0
         },
         {
-          channel: 'red',
           timeMs: parseTimeToMs('08:30:00'),
           intensity: 0.2
         },
         {
-          channel: 'red',
           timeMs: parseTimeToMs('09:00:00'),
           intensity: 0.05
-        },
+        }
+      ],
+      blue: [
         {
-          channel: 'blue',
           timeMs: parseTimeToMs('09:00:00'),
           intensity: 0.1
         },
         {
-          channel: 'blue',
           timeMs: parseTimeToMs('10:00:00'),
           intensity: 0.5
         },
         {
-          channel: 'blue',
           timeMs: parseTimeToMs('20:00:00'),
           intensity: 0.5
         },
         {
-          channel: 'blue',
           timeMs: parseTimeToMs('20:30:00'),
           intensity: 0.09
         },
+      ],
+      white: [
         {
-          channel: 'white',
           timeMs: parseTimeToMs('08:45:00'),
           intensity: 0
         },
         {
-          channel: 'white',
           timeMs: parseTimeToMs('10:00:00'),
           intensity: 1
         },
         {
-          channel: 'white',
           timeMs: parseTimeToMs('20:00:00'),
           intensity: 1
         },
         {
-          channel: 'white',
           timeMs: parseTimeToMs('21:00:00'),
           intensity: 0
         }
@@ -85,17 +78,20 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
     ActionHero.api.chatRoom.addMiddleware({
       name: 'notifyAutoScheduleUpdateOnConnect',
       join: (connection, room) => {
-        ActionHero.api.autoSchedule.sendScheduleUpdate(ActionHero.api.autoSchedule.schedule, 0)
+        ActionHero.api.autoSchedule.sendScheduleUpdate('red', 0)
+        ActionHero.api.autoSchedule.sendScheduleUpdate('blue', 0)
+        ActionHero.api.autoSchedule.sendScheduleUpdate('white', 0)
       }
     })
 
-    ActionHero.api.autoSchedule.sendScheduleUpdate = async (schedule, changedBy) => {
+    ActionHero.api.autoSchedule.sendScheduleUpdate = async (channel, changedBy) => {
       await ActionHero.api.chatRoom.broadcast(
         {},
         'defaultRoom',
         JSON.stringify({
           type: 'notifyAutoScheduleChange',
-          schedule: schedule,
+          channel: channel,
+          schedule: ActionHero.api.autoSchedule[channel],
           changedBy: 0
         }))
     }
