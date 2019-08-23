@@ -32,6 +32,7 @@ export class AutoScheduleChannel {
     if (this.#highlighted !== isHighlighted) {
       this.#highlighted = isHighlighted
       this.#needsDraw = true
+      this.drawIfNeeded()
     }
   }
 
@@ -57,12 +58,14 @@ export class AutoScheduleChannel {
     this.#needsDraw = true
     this.#schedule = schedule
     this.#nodes = undefined
+    this.drawIfNeeded()
   }
 
   onResize () {
     this.#needsDraw = true
     AutoScheduleUtils.resizeCanvasToFitInParent(this.#canvas)
     this.#nodes = undefined
+    this.drawIfNeeded()
   }
 
   drawIfNeeded () {
