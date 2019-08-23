@@ -21,7 +21,11 @@ export function registerAutoTimeCanvas (client, containingElement) {
 
   const axis = new AutoScheduleAxis(containingElement,chartAreaDimensions)
 
-  const mouseController = new AutoScheduleMouseController(containingElement,axis, Enumerable.from(channels).select(pair => pair.value))
+  const mouseController = new AutoScheduleMouseController(
+    containingElement,
+    axis,
+    Enumerable.from(channels).select(pair => pair.value),
+    chartAreaDimensions)
 
   client.on('say', function (data) {
     const messageObj = JSON.parse(data.message)
@@ -31,6 +35,7 @@ export function registerAutoTimeCanvas (client, containingElement) {
         .groupBy(element => element.channel)
         .forEach(oneChannelSchedule => {
           channels[oneChannelSchedule.key()].schedule = oneChannelSchedule
+            .orderBy(scheduleElement => scheduleElement.timeMs)
         })
     }
   })

@@ -1,21 +1,79 @@
+import * as AutoScheduleUtils from './auto-schedule-utils.js'
+
 export class AutoScheduleMouseController {
   #lastMouseCoordinate
   #autoScheduleAxis
   #channels
+  #draggedNode
+  #containingElement
   static mouseFudgeFactor = 10
+  #chartAreaDimensions
 
-  constructor(containingElement, autoScheduleAxis, channels) {
+  constructor(containingElement, autoScheduleAxis, channels, chartAreaDimensions) {
+    this.#containingElement = containingElement
     this.#channels = channels
     this.#autoScheduleAxis = autoScheduleAxis
+    this.#chartAreaDimensions = chartAreaDimensions
 
-    containingElement.addEventListener('mousemove', (event) => {
+    this.#containingElement.addEventListener('mousemove', (event) => {
       this.#updateMousePosition(autoScheduleAxis.convertMouseEventCoordinates(event))
     })
 
-    containingElement.addEventListener('mouseleave', () => {
+    this.#containingElement.addEventListener('mouseleave', () => {
+      this.#endDrag()
+      this.#draggedNode = undefined
       this.#updateMousePosition()
     })
 
+    this.#containingElement.addEventListener("pointerdown", this.#onPointerDown)
+    this.#containingElement.addEventListener("pointerup", this.#onPointerUp)
+  }
+
+  #onDrag = (event) => {
+    if (this.#draggedNode) {
+      const coordinate = this.#autoScheduleAxis.convertMouseEventCoordinates(event)
+
+      const intensity = AutoScheduleUtils.translateYToIntensity(this.#draggedNode.channel.context, coordinate.y,this.#chartAreaDimensions)
+      let timeMs = AutoScheduleUtils.translateXToTimeMs(this.#draggedNode.channel.context, coordinate.x,this.#chartAreaDimensions)
+
+      const node = this.#draggedNode.channel.nodes[this.#draggedNode.index]
+      if(this.#draggedNode.index > 0) {
+        if(timeMs < this.#draggedNode.channel.nodes[this.#draggedNode.index-1].schedulePoint.timeMs) {
+          timeMs = this.#draggedNode.channel.nodes[this.#draggedNode.index-1].schedulePoint.timeMs
+        }
+      }
+      if(this.#draggedNode.index < this.#draggedNode.channel.nodes.length -2) {
+        if(timeMs > this.#draggedNode.channel.nodes[this.#draggedNode.index+1].schedulePoint.timeMs) {
+          timeMs = this.#draggedNode.channel.nodes[this.#draggedNode.index+1].schedulePoint.timeMs
+        }
+      }
+      node.schedulePoint.intensity = intensity
+      node.schedulePoint.timeMs = timeMs
+
+      const schedule = this.#draggedNode.channel.schedule
+      this.#draggedNode.channel.schedule = schedule
+
+    }
+  }
+
+  #onPointerDown = (event) => {
+    const coordinate = this.#autoScheduleAxis.convertMouseEventCoordinates(event)
+    const matchingNode = this.#getFirstMatchingNode(coordinate)
+    this.#draggedNode = matchingNode
+    if(matchingNode) {
+      this.#containingElement.addEventListener('pointermove', this.#onDrag)
+    }
+    console.log(event)
+  }
+
+  #onPointerUp = (event) => {
+    this.#endDrag()
+    console.log(event)
+  }
+
+  #endDrag = () => {
+    this.#containingElement.removeEventListener('pointermove', this.#onDrag)
+    this.#draggedNode = undefined
   }
 
   #isEquivalent = (a, b) => {
@@ -57,28 +115,33 @@ export class AutoScheduleMouseController {
     if(! this.#isEquivalent(this.#lastMouseCoordinate, coordinate) || this.#lastMouseCoordinate === undefined) {
       window.requestAnimationFrame(() => {
 
-        const firstMatchingNode = Enumerable.from(this.#channels)
-          .selectMany(channel => channel.nodes)
-          .firstOrDefault(channelNode => {
-            if(channelNode.coordinate.x - AutoScheduleMouseController.mouseFudgeFactor <= coordinate.x && channelNode.coordinate.x + AutoScheduleMouseController.mouseFudgeFactor >= coordinate.x) {
-              if(channelNode.coordinate.y - AutoScheduleMouseController.mouseFudgeFactor <= coordinate.y && channelNode.coordinate.y + AutoScheduleMouseController.mouseFudgeFactor >= coordinate.y) {
-                return true;
-              }
-            }
-            return false;
-          })
+        const firstMatchingNode = this.#draggedNode || this.#getFirstMatchingNode(coordinate)
 
-        const stickyCoordinate = firstMatchingNode ? firstMatchingNode.coordinate : coordinate
-        const intensity = firstMatchingNode ? firstMatchingNode.schedulePoint.intensity : undefined
-        const timeMs = firstMatchingNode ? firstMatchingNode.schedulePoint.timeMs : undefined
+        const stickyCoordinate = firstMatchingNode ? firstMatchingNode.channel.nodes[firstMatchingNode.index].coordinate : coordinate
+        const intensity = firstMatchingNode ? firstMatchingNode.channel.nodes[firstMatchingNode.index].schedulePoint.intensity : undefined
+        const timeMs = firstMatchingNode ? firstMatchingNode.channel.nodes[firstMatchingNode.index].schedulePoint.timeMs : undefined
 
         this.#autoScheduleAxis.drawMouseTicks(stickyCoordinate, intensity, timeMs)
         Enumerable.from(this.#channels)
           .forEach(channel => {
-            channel.highlighted = firstMatchingNode && firstMatchingNode.schedulePoint.channel === channel.name
+            channel.highlighted = firstMatchingNode && firstMatchingNode.channel.nodes[firstMatchingNode.index].schedulePoint.channel === channel.name
           })
       })
     }
     this.#lastMouseCoordinate = coordinate
+  }
+
+  #getFirstMatchingNode = (coordinate) => {
+    return this.#channels.select(channel => {
+        const matchingNode = channel.findNodeAtCoordinate(coordinate, AutoScheduleMouseController.mouseFudgeFactor)
+        if (matchingNode) {
+          return {
+            channel: channel,
+            index: matchingNode.index
+          }
+        }
+        return undefined
+      })
+      .firstOrDefault(element => element)
   }
 }

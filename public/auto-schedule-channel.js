@@ -28,6 +28,10 @@ export class AutoScheduleChannel {
     return this.#name
   }
 
+  get context() {
+    return this.#canvas.getContext('2d')
+  }
+
   set highlighted (isHighlighted) {
     if (this.#highlighted !== isHighlighted) {
       this.#highlighted = isHighlighted
@@ -38,10 +42,9 @@ export class AutoScheduleChannel {
 
   get nodes () {
     if (!this.#nodes) {
-      const ctx = this.#canvas.getContext('2d')
+      const ctx = this.context
       this.#needsDraw = true
       this.#nodes = this.#schedule
-        .orderBy(scheduleItem => scheduleItem.timeMs)
         .select(scheduleItem => ({
           coordinate: {
             x: AutoScheduleUtils.translateTimeMsToX(ctx, scheduleItem.timeMs, this.#dimensions),
@@ -61,6 +64,10 @@ export class AutoScheduleChannel {
     this.drawIfNeeded()
   }
 
+  get schedule () {
+    return this.#schedule
+  }
+
   onResize () {
     this.#needsDraw = true
     AutoScheduleUtils.resizeCanvasToFitInParent(this.#canvas)
@@ -70,7 +77,7 @@ export class AutoScheduleChannel {
 
   drawIfNeeded () {
     if (this.#needsDraw && this.#schedule) {
-      const ctx = this.#canvas.getContext('2d')
+      const ctx = this.context
 
       this.#canvas.style.zIndex = this.#highlighted ? '35' : '30'
       ctx.shadowBlur = this.#highlighted ? AutoScheduleChannel.highlightBlurLevel : 0
@@ -112,5 +119,20 @@ export class AutoScheduleChannel {
       })
       this.#needsDraw = false
     }
+  }
+
+  findNodeAtCoordinate(coordinate, fudgeFactor) {
+    for(let index = 0 ; index < this.nodes.length ; index++) {
+      const channelNode = this.nodes[index]
+      if (channelNode.coordinate.x - fudgeFactor <= coordinate.x && channelNode.coordinate.x + fudgeFactor >= coordinate.x) {
+        if (channelNode.coordinate.y - fudgeFactor <= coordinate.y && channelNode.coordinate.y + fudgeFactor >= coordinate.y) {
+          return {
+            node: channelNode,
+            index: index
+          }
+        }
+      }
+    }
+    return undefined
   }
 }
