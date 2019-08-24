@@ -9,6 +9,7 @@ export class AutoScheduleAxis {
   static mouseAxisTextColour = '#6a6a6a'
   static mouseAxisTextFont = '20px sans-serif'
   static axisColour = '#d9d9d9'
+  static currentTimeColour = '#ffa600'
 
   #chartAreaDimensions
   #axisCanvas
@@ -18,6 +19,9 @@ export class AutoScheduleAxis {
     this.#chartAreaDimensions = dimensions
     this.#axisCanvas = AutoScheduleUtils.createCanvasAndAddToContainingElement('axisCanvas',2, containerElement)
     this.#mouseCanvas = AutoScheduleUtils.createCanvasAndAddToContainingElement('mouseCanvas',1, containerElement)
+    setTimeout(() => {
+      this.drawAxis()
+    },60000)
   }
 
   get mouseCanvas() {
@@ -60,6 +64,9 @@ export class AutoScheduleAxis {
 
   drawAxis() {
     const ctx = this.#axisCanvas.getContext('2d')
+    ctx.save()
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height)
+    ctx.beginPath()
     ctx.lineWidth = 1
     ctx.strokeStyle = AutoScheduleAxis.axisColour
     ctx.strokeRect(this.#chartAreaDimensions.leftGutter, this.#chartAreaDimensions.topGutter, ctx.canvas.clientWidth - this.#chartAreaDimensions.rightGutter - this.#chartAreaDimensions.leftGutter, ctx.canvas.clientHeight - this.#chartAreaDimensions.bottomGutter - this.#chartAreaDimensions.topGutter)
@@ -72,6 +79,16 @@ export class AutoScheduleAxis {
         ctx.lineTo(x, y + 10)
         ctx.stroke()
       })
+    const timeMs = new Date().getTime() % 86400000
+    ctx.beginPath()
+    ctx.lineWidth = 1
+    ctx.strokeStyle = AutoScheduleAxis.currentTimeColour
+    ctx.setLineDash([5, 3])
+    const x = AutoScheduleUtils.translateTimeMsToX(ctx, timeMs, this.#chartAreaDimensions)
+    ctx.moveTo(x, AutoScheduleUtils.translateIntensityToY(ctx, 0, this.#chartAreaDimensions))
+    ctx.lineTo(x, AutoScheduleUtils.translateIntensityToY(ctx, 1.0, this.#chartAreaDimensions))
+    ctx.stroke()
+    ctx.restore()
   }
 
   onResize() {
