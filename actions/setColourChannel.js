@@ -20,11 +20,11 @@ module.exports = class SetColourChannelAction extends ActionHero.Action {
       intensity: {
         required: true,
         formatter: (param, connection, actionTemplate) => {
-          return parseInt(param)
+          return parseFloat(param)
         },
         validator: (param, connection, actionTemplate) => {
-          if (param < 0 || param > 255) {
-            throw new Error('intensity is not 1 - 255')
+          if (param < 0.0 || param > 1.0) {
+            throw new Error('intensity is not 0.0 - 1.0')
           }
         }
       }

@@ -47,13 +47,29 @@
             transition: opacity .2s;
         }
 
-        .number {
+        .numberInput {
             border: none;
             width: 3em;
             display: inline-block;
             font-size: larger;
             background: black;
             color: white;
+        }
+
+        .channelDisplay {
+            font-size: larger;
+            text-align: right;
+            width: 4em;
+        }
+
+        #whiteChannelDisplay {
+            color: white;
+        }
+        #redChannelDisplay {
+            color: red;
+        }
+        #blueChannelDisplay {
+            color: blue;
         }
 
         .slider::-webkit-slider-thumb {
@@ -129,7 +145,7 @@
 
         const setConnectedIconColour = (colour) => document.querySelector('#connectedIcon').style.color = colour
 
-        const debounceTimeMs = 200
+        const debounceTimeMs = 100
         document.addEventListener('DOMContentLoaded', function ()  {
             const client = new ActionheroWebsocketClient();
 
@@ -147,8 +163,11 @@
                 {
                   AutoScheduleEditor.registerAutoTimeCanvas(client,document.querySelector('#autoPage'), debounceTimeMs)
 
-                  document.querySelectorAll('#rangeSliderRed, #numberRed, #rangeSliderBlue, #numberBlue, #rangeSliderWhite, #numberWhite')
+                  document.querySelectorAll('#rangeSliderRed, #numberRedInput, #rangeSliderBlue, #numberBlueInput, #rangeSliderWhite, #numberWhiteInput')
                     .forEach(element => LinkedColourChannelInput.registerColourChannelInput(client, element,debounceTimeMs , element.getAttribute("data-colourChannel")));
+
+                  document.querySelectorAll('#whiteChannelDisplay, #redChannelDisplay, #blueChannelDisplay')
+                    .forEach(element => LinkedColourChannelInput.registerColourChannelDisplay(client, element, element.getAttribute("data-colourChannel")));
 
                   registerLinkedModeSwitch(client, mode => {
                     document.querySelector('#channelsPage').style.display = mode === 'manual' ? 'block' : 'none'
@@ -187,6 +206,10 @@
 
         <div style="display: flex; padding: 10px">
             <div style="flex-grow: 1"></div>
+            <div id="whiteChannelDisplay" class="channelDisplay" data-colourChannel="white">a</div>
+            <div id="redChannelDisplay" class="channelDisplay" data-colourChannel="red">b</div>
+            <div id="blueChannelDisplay" class="channelDisplay" data-colourChannel="blue" style="margin-right: 2em;">c</div>
+
             <ul class="lightsModeMultiButton" >
                 <li rel="off" class="lightsModeButton">Off</li>
                 <li rel="manual" class="lightsModeButton">Manual</li>
@@ -197,21 +220,21 @@
         <div id="channelsPage" class="pagePanel">
             <div class="channelContainer">
                 <div class="sliderContainer">
-                    <input disabled data-colourChannel="white" type="range" min="0" max="255" value="50" class="slider sliderWhite" id="rangeSliderWhite" >
+                    <input disabled data-colourChannel="white" type="range" min="0" max="100" value="50" class="slider sliderWhite" id="rangeSliderWhite" >
                 </div>
-                <input disabled data-colourChannel="white" type="number" min="0" max="255" value="50" class="number" id="numberWhite" >
+                <input disabled data-colourChannel="white" type="number" min="0" max="100" value="50" class="numberInput" id="numberWhiteInput">
             </div>
             <div class="channelContainer">
                 <div class="sliderContainer">
-                    <input disabled data-colourChannel="red" type="range" min="0" max="255" value="50" class="slider sliderRed" id="rangeSliderRed" >
+                    <input disabled data-colourChannel="red" type="range" min="0" max="100" value="50" class="slider sliderRed" id="rangeSliderRed" >
                 </div>
-                <input disabled data-colourChannel="red" type="number" min="0" max="255" value="50" class="number" id="numberRed" >
+                <input disabled data-colourChannel="red" type="number" min="0" max="100" value="50" class="numberInput" id="numberRedInput">
             </div>
             <div class="channelContainer">
                 <div class="sliderContainer">
-                    <input disabled data-colourChannel="blue" type="range" min="0" max="255" value="50" class="slider sliderBlue" id="rangeSliderBlue" >
+                    <input disabled data-colourChannel="blue" type="range" min="0" max="100" value="50" class="slider sliderBlue" id="rangeSliderBlue" >
                 </div>
-                <input disabled data-colourChannel="blue" type="number" min="0" max="255" value="50" class="number" id="numberBlue" >
+                <input disabled data-colourChannel="blue" type="number" min="0" max="100" value="50" class="numberInput" id="numberBlueInput">
             </div>
         </div>
 
