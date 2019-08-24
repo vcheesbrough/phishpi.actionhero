@@ -3,8 +3,6 @@ const AutoScheduleCalculator = require('../modules/autoScheduleCalculator')
 
 describe('AutoScheduleCalculator', () => {
   let defaultSchedule
-  let mockOnIntensityChange
-  let mockOnScheduleChange
   let mockTimeOfDayUtc
   let target
   beforeEach(() => {
@@ -26,12 +24,8 @@ describe('AutoScheduleCalculator', () => {
         timeMs: 4000
       }
     ]
-    mockOnIntensityChange = jest.fn()
-    mockOnScheduleChange = jest.fn()
     mockTimeOfDayUtc = jest.fn().mockReturnValue(2000)
     target = new AutoScheduleCalculator('colour', mockTimeOfDayUtc)
-    target.addOnIntensityChangeListener(mockOnIntensityChange)
-    target.addOnScheduleChangeListener(mockOnScheduleChange)
   })
 
   describe('schedule property', () => {
@@ -69,6 +63,12 @@ describe('AutoScheduleCalculator', () => {
   })
 
   describe('Intensity Change Event', () => {
+    let mockOnIntensityChange
+    beforeEach(() => {
+      mockOnIntensityChange = jest.fn()
+      target.addOnIntensityChangeListener(mockOnIntensityChange)
+    })
+
     test('when initial set schedule, then intensity change event', () => {
       target.setSchedule(defaultSchedule)
       expect(mockOnIntensityChange).toHaveBeenCalledTimes(1)
@@ -124,12 +124,148 @@ describe('AutoScheduleCalculator', () => {
       expect(mockOnIntensityChange).not.toHaveBeenCalled()
     })
 
+    test('given schedule set when trigger intensity event then intensity change event fired', () => {
+      mockTimeOfDayUtc.mockReturnValue(1000)
+      target.setSchedule(defaultSchedule)
+      mockOnIntensityChange.mockClear()
+
+      mockTimeOfDayUtc.mockReturnValue(1500)
+
+      target.checkAndTriggerIntensityEvent()
+
+      expect(mockOnIntensityChange).toHaveBeenCalled()
+    })
   })
 
   describe('schedule change event', () => {
+    let mockOnScheduleChange
+    beforeEach(() => {
+      mockOnScheduleChange = jest.fn()
+      target.addOnScheduleChangeListener(mockOnScheduleChange)
+    })
     test('when schedule set, then schedule change event', () => {
       target.setSchedule(defaultSchedule, 'changedByTest')
       expect(mockOnScheduleChange).toHaveBeenCalledWith('colour', defaultSchedule, 'changedByTest')
     })
   })
+
+  describe('next intensity change time event', () => {
+    let mockNextIntensityChangeTimeEvent
+    beforeEach(() => {
+      mockNextIntensityChangeTimeEvent = jest.fn()
+      target.addNextIntensityChangeTimeListener(mockNextIntensityChangeTimeEvent)
+    })
+    test('when set schedule with intensity values all same then no next intensity change time event', () => {
+      defaultSchedule.forEach(scheduleItem => scheduleItem.intensity = 0.5)
+
+      target.setSchedule(defaultSchedule)
+
+      expect(mockNextIntensityChangeTimeEvent).not.toHaveBeenCalled()
+    })
+    test('when set schedule with intensity starting rise then next intensity change event fired', () => {
+      mockTimeOfDayUtc.mockReturnValue(1000)
+
+      target.setSchedule([
+        {
+          timeMs: 1000,
+          intensity: 100
+        },
+        {
+          timeMs: 1100,
+          intensity: 200
+        },
+      ])
+
+      expect(mockNextIntensityChangeTimeEvent).toHaveBeenCalledWith('colour', 1001)
+    })
+    test('when set schedule with intensity starting fall then next intensity change event fired', () => {
+      mockTimeOfDayUtc.mockReturnValue(1000)
+
+      target.setSchedule([
+        {
+          timeMs: 1000,
+          intensity: 200
+        },
+        {
+          timeMs: 1100,
+          intensity: 100
+        },
+      ])
+
+      expect(mockNextIntensityChangeTimeEvent).toHaveBeenCalledWith('colour', 1001)
+    })
+    test('when set schedule with intensity rising then next intensity change event fired', () => {
+      mockTimeOfDayUtc.mockReturnValue(1050)
+
+      target.setSchedule([
+        {
+          timeMs: 1000,
+          intensity: 100
+        },
+        {
+          timeMs: 1100,
+          intensity: 200
+        },
+      ])
+
+      expect(mockNextIntensityChangeTimeEvent).toHaveBeenCalledWith('colour', 1051)
+    })
+    test('when set schedule with intensity falling then next intensity change event fired', () => {
+      mockTimeOfDayUtc.mockReturnValue(1050)
+
+      target.setSchedule([
+        {
+          timeMs: 1000,
+          intensity: 200
+        },
+        {
+          timeMs: 1100,
+          intensity: 100
+        },
+      ])
+
+      expect(mockNextIntensityChangeTimeEvent).toHaveBeenCalledWith('colour', 1051)
+    })
+    test('when set schedule with intensity rising in future then next intensity change event fired', () => {
+      mockTimeOfDayUtc.mockReturnValue(500)
+
+      target.setSchedule([
+        {
+          timeMs: 1000,
+          intensity: 100
+        },
+        {
+          timeMs: 1100,
+          intensity: 200
+        },
+        {
+          timeMs: 1200,
+          intensity: 100
+        },
+      ])
+
+      expect(mockNextIntensityChangeTimeEvent).toHaveBeenCalledWith('colour', 1001)
+    })
+    test('when set schedule with intensity falling in future then next intensity change event fired', () => {
+      mockTimeOfDayUtc.mockReturnValue(500)
+
+      target.setSchedule([
+        {
+          timeMs: 1000,
+          intensity: 200
+        },
+        {
+          timeMs: 1100,
+          intensity: 100
+        },
+        {
+          timeMs: 1200,
+          intensity: 200
+        },
+      ])
+
+      expect(mockNextIntensityChangeTimeEvent).toHaveBeenCalledWith('colour', 1001)
+    })
+  })
+
 })

@@ -68,7 +68,8 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
 
     Enumerable.from(ActionHero.api.autoSchedule.calculators)
       .forEach(pair => {
-        pair.value.addOnScheduleChangeListener((channel, schedule, changedBy) => ActionHero.api.autoSchedule.sendScheduleUpdate(channel, changedBy, schedule))
+        pair.value.addOnScheduleChangeListener((channel, schedule, changedBy) =>
+          ActionHero.api.autoSchedule.sendScheduleUpdate(channel, changedBy, schedule))
         pair.value.addOnIntensityChangeListener((channel, intensity, changedBy) => {
           const newIntensity = ActionHero.api.autoSchedule.translators[channel].translateNativeValueToPercentage(intensity)
           ActionHero.api.colourChannels.setIntensity(channel, newIntensity, changedBy)
