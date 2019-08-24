@@ -11,7 +11,7 @@ module.exports = class SetScheduleAction extends ActionHero.Action {
       channel: {
         required: true,
         validator: (param, connection, actionTemplate) => {
-          const allColours = Object.keys(ActionHero.api.autoSchedule.schedule)
+          const allColours = ActionHero.api.autoSchedule.allChannels
           if (!allColours.includes(param)) {
             throw new Error('channel not one of ' + allColours.join(','))
           }

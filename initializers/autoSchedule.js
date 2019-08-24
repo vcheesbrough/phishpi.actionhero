@@ -1,6 +1,8 @@
 'use strict'
 const ActionHero = require('actionhero')
 const Enumerable = require('linq/linq.js');
+const AutoScheduleCalculator = require('../modules/autoScheduleCalculator')
+const IntensityTranslator = require('../modules/intensityTranslator')
 
 const parseTimeToMs = (s) => {
   const re = /(\d{2}):(\d{2}):(\d{2})(\.(\d{3}))?/
@@ -17,67 +19,25 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
   constructor () {
     super()
     this.name = 'autoSchedule'
-    this.loadPriority = 1000
-    this.startPriority = 1000
+    this.loadPriority = 1001
+    this.startPriority = 1001
     this.stopPriority = 1000
   }
 
   async initialize () {
     ActionHero.api.autoSchedule = {
-      schedule: {
-        red: [
-          {
-            timeMs: parseTimeToMs('08:00:00'),
-            intensity: 0
-          },
-          {
-            timeMs: parseTimeToMs('08:30:00'),
-            intensity: 0.2
-          },
-          {
-            timeMs: parseTimeToMs('09:00:00'),
-            intensity: 0.05
-          }
-        ],
-        blue: [
-          {
-            timeMs: parseTimeToMs('09:00:00'),
-            intensity: 0.1
-          },
-          {
-            timeMs: parseTimeToMs('10:00:00'),
-            intensity: 0.5
-          },
-          {
-            timeMs: parseTimeToMs('20:00:00'),
-            intensity: 0.5
-          },
-          {
-            timeMs: parseTimeToMs('20:30:00'),
-            intensity: 0.09
-          },
-        ],
-        white: [
-          {
-            timeMs: parseTimeToMs('08:45:00'),
-            intensity: 0
-          },
-          {
-            timeMs: parseTimeToMs('10:00:00'),
-            intensity: 1
-          },
-          {
-            timeMs: parseTimeToMs('20:00:00'),
-            intensity: 1
-          },
-          {
-            timeMs: parseTimeToMs('21:00:00'),
-            intensity: 0
-          }
-        ]
-      }
+      calculators: {
+        red: new AutoScheduleCalculator('red'),
+        blue: new AutoScheduleCalculator('blue'),
+        white: new AutoScheduleCalculator('white'),
+      },
+      translators: {
+        red: new IntensityTranslator(255),
+        blue: new IntensityTranslator(255),
+        white: new IntensityTranslator(255),
+      },
+      allChannels: ['red', 'white', 'blue']
     }
-
     ActionHero.api.chatRoom.addMiddleware({
       name: 'notifyAutoScheduleUpdateOnConnect',
       join: (connection, room) => {
@@ -88,26 +48,86 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
     })
 
     ActionHero.api.autoSchedule.setSchedule = async (channel, schedule, changedBy) => {
-      if(!Enumerable.from(schedule).sequenceEqual(ActionHero.api.autoSchedule.schedule[channel],element => JSON.stringify(element))) {
-        ActionHero.api.autoSchedule.schedule[channel] = schedule
-        await ActionHero.api.autoSchedule.sendScheduleUpdate(channel,changedBy)
-      }
+      ActionHero.api.autoSchedule.calculators[channel].setSchedule(ActionHero.api.autoSchedule.translators[channel].translateScheduleToNative(schedule), changedBy)
     }
 
-    ActionHero.api.autoSchedule.sendScheduleUpdate = async (channel, changedBy) => {
+    ActionHero.api.autoSchedule.sendScheduleUpdate = async (channel, changedBy, newSchedule) => {
+      const schedule = ActionHero.api.autoSchedule.translators[channel]
+        .translateScheduleToPercent(newSchedule || ActionHero.api.autoSchedule.calculators[channel].schedule)
+        .toArray()
       await ActionHero.api.chatRoom.broadcast(
         {},
         'defaultRoom',
         JSON.stringify({
           type: 'notifyAutoScheduleChange',
           channel: channel,
-          schedule: ActionHero.api.autoSchedule.schedule[channel],
+          schedule: schedule,
           changedBy: changedBy
         }))
     }
+
+    Enumerable.from(ActionHero.api.autoSchedule.calculators)
+      .forEach(pair => {
+        pair.value.addOnScheduleChangeListener((channel, schedule, changedBy) => ActionHero.api.autoSchedule.sendScheduleUpdate(channel, changedBy, schedule))
+        pair.value.addOnIntensityChangeListener((channel, intensity, changedBy) => {
+          const newIntensity = ActionHero.api.autoSchedule.translators[channel].translateNativeValueToPercentage(intensity)
+          ActionHero.api.colourChannels.setIntensity(channel, newIntensity, changedBy)
+        })
+      })
   }
 
-  async start () {}
+  async start () {
+    await ActionHero.api.autoSchedule.setSchedule('red', [
+      {
+        timeMs: parseTimeToMs('08:00:00'),
+        intensity: 0
+      },
+      {
+        timeMs: parseTimeToMs('08:30:00'),
+        intensity: 0.2
+      },
+      {
+        timeMs: parseTimeToMs('09:00:00'),
+        intensity: 0.05
+      }
+    ], 0)
+    await ActionHero.api.autoSchedule.setSchedule('blue', [
+      {
+        timeMs: parseTimeToMs('09:00:00'),
+        intensity: 0.1
+      },
+      {
+        timeMs: parseTimeToMs('10:00:00'),
+        intensity: 0.5
+      },
+      {
+        timeMs: parseTimeToMs('20:00:00'),
+        intensity: 0.5
+      },
+      {
+        timeMs: parseTimeToMs('20:30:00'),
+        intensity: 0.09
+      },
+    ], 0)
+    await ActionHero.api.autoSchedule.setSchedule('white', [
+      {
+        timeMs: parseTimeToMs('08:45:00'),
+        intensity: 0
+      },
+      {
+        timeMs: parseTimeToMs('10:00:00'),
+        intensity: 1
+      },
+      {
+        timeMs: parseTimeToMs('20:00:00'),
+        intensity: 1
+      },
+      {
+        timeMs: parseTimeToMs('21:00:00'),
+        intensity: 0
+      }
+    ], 0)
+  }
 
   async stop () {}
 }

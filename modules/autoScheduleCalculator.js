@@ -6,9 +6,9 @@ const Enumerable = require('linq/linq.js')
 module.exports = class AutosScheduleCalculator {
 
   constructor (channel, timeOfDayUtc) {
-    this.eventEmitter = new EventEmitter()
-    this.channel = channel
-    this.timeOfDayUtc = timeOfDayUtc
+    this._eventEmitter = new EventEmitter()
+    this._channel = channel
+    this._timeOfDayUtc = timeOfDayUtc || (() => new Date().getTime() % 86400000)
     this._schedule = undefined
   }
 
@@ -16,13 +16,13 @@ module.exports = class AutosScheduleCalculator {
     return this._schedule
   }
 
-  set schedule (newSchedule) {
+  setSchedule (newSchedule, changedBy) {
     const newScheduleEnumerable = Enumerable.from(newSchedule)
       .orderBy(scheduleItem => scheduleItem.timeMs)
 
     if (this._schedule === undefined || !newScheduleEnumerable.sequenceEqual(this._schedule, scheduleItem => JSON.stringify(scheduleItem))) {
       this._schedule = newScheduleEnumerable.toArray()
-      const currentTime = this.timeOfDayUtc()
+      const currentTime = this._timeOfDayUtc()
       const before = newScheduleEnumerable
         .insert(0, Enumerable.repeat({
           intensity: newScheduleEnumerable.last().intensity,
@@ -44,11 +44,16 @@ module.exports = class AutosScheduleCalculator {
 
       const eventIntensity = before.intensity + (slope * (currentTime - before.timeMs))
 
-      this.eventEmitter.emit('intensitychange', this.channel, Math.floor(eventIntensity))
+      this._eventEmitter.emit('schedulechange', this._channel, this._schedule, changedBy)
+      this._eventEmitter.emit('intensitychange', this._channel, Math.floor(eventIntensity), changedBy)
     }
   }
 
   addOnIntensityChangeListener (func) {
-    this.eventEmitter.on('intensitychange', func)
+    this._eventEmitter.on('intensitychange', func)
+  }
+
+  addOnScheduleChangeListener (func) {
+    this._eventEmitter.on('schedulechange', func)
   }
 }

@@ -30,7 +30,7 @@ export const translateTimeMsToX = (ctx, timeMs, chartAreaDimensions) => {
 
 export const translateYToIntensity = (ctx, y, chartAreaDimensions) => {
   const ratio = 1.0 / (ctx.canvas.clientHeight - chartAreaDimensions.topGutter - chartAreaDimensions.bottomGutter)
-  return 1.0 - ((y-chartAreaDimensions.topGutter) * ratio)
+  return Math.round((1.0 - ((y - chartAreaDimensions.topGutter) * ratio)) * 1000) / 1000
 }
 
 export const translateIntensityToY = (ctx, intensity, chartAreaDimensions) => {
