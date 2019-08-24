@@ -12,13 +12,13 @@ export class AutoScheduleChannel {
   #dimensions
   #containerElement
   static nodeRadius = 5
-  static nodeFillColour = 'white'
-  static highlightBlurLevel = 10
-  static highlightBlueColour = 'gray'
+  static nodeFillColour = 'black'
+  static highlightBlurLevel = 15
+  static highlightBlurColour = 'lightgray'
   static colourLookup = {
-    red: '#ff0000',
-    blue: '#0008ff',
-    white: '#000000'
+    red: '#ff4747',
+    blue: '#5b47ff',
+    white: '#FFFFFF'
   }
 
   constructor (channelName, containerElement, dimensions) {
@@ -105,7 +105,7 @@ export class AutoScheduleChannel {
 
       this.#canvas.style.zIndex = this.#highlighted ? '35' : '30'
       ctx.shadowBlur = this.#highlighted ? AutoScheduleChannel.highlightBlurLevel : 0
-      ctx.shadowColor = AutoScheduleChannel.highlightBlueColour
+      ctx.shadowColor = AutoScheduleChannel.highlightBlurColour
 
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       ctx.beginPath()

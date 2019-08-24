@@ -52,6 +52,8 @@
             width: 3em;
             display: inline-block;
             font-size: larger;
+            background: black;
+            color: white;
         }
 
         .slider::-webkit-slider-thumb {
@@ -81,11 +83,11 @@
         }
 
         .sliderWhite::-webkit-slider-thumb {
-            background: black;
+            background: white;
         }
 
         .sliderWhite::-moz-range-thumb {
-            background: black;
+            background: white;
         }
 
     </style>
@@ -127,7 +129,7 @@
 
         const setConnectedIconColour = (colour) => document.querySelector('#connectedIcon').style.color = colour
 
-        const debounceTimeMs = 100
+        const debounceTimeMs = 200
         document.addEventListener('DOMContentLoaded', function ()  {
             const client = new ActionheroWebsocketClient();
 
@@ -179,7 +181,7 @@
         });
     </script>
 </head>
-<body>
+<body style="background: black;">
     <div style="position:absolute;top:10px;left:10px;color: white" id="connectedIcon">☍</div>
     <div style="display: flex; flex-direction: column; height: 100%">
 

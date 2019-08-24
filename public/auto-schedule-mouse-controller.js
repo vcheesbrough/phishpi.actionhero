@@ -17,11 +17,11 @@ export class AutoScheduleMouseController {
     this.#autoScheduleAxis = autoScheduleAxis
     this.#chartAreaDimensions = chartAreaDimensions
 
-    this.#containingElement.addEventListener('mousemove', (event) => {
+    this.#containingElement.addEventListener('pointermove', (event) => {
       this.#updateMousePosition(autoScheduleAxis.convertMouseEventCoordinates(event))
     })
 
-    this.#containingElement.addEventListener('mouseleave', () => {
+    this.#containingElement.addEventListener('pointerleave', () => {
       this.#endDrag()
       this.#draggedNode = undefined
       this.#updateMousePosition()
