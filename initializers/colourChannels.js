@@ -1,12 +1,13 @@
 'use strict'
 const ActionHero = require('actionhero')
+const Enumerable = require('linq/linq.js')
 
 module.exports = class ColourChannelInitialiser extends ActionHero.Initializer {
   constructor () {
     super()
     this.name = 'colourChannels'
-    this.loadPriority = 1000
-    this.startPriority = 1000
+    this.loadPriority = 1001
+    this.startPriority = 1001
     this.stopPriority = 1000
   }
 
@@ -43,6 +44,13 @@ module.exports = class ColourChannelInitialiser extends ActionHero.Initializer {
           changedBy: changedBy
         }))
     }
+    await ActionHero.api.lightsMode.addLightsModeChangeListener(newMode => {
+      if (newMode === 'off') {
+        Enumerable.from(ActionHero.api.colourChannels.channelValues)
+          .select(pair => pair.key)
+          .forEach(channel => ActionHero.api.colourChannels.setIntensity(channel, 0, 0))
+      }
+    })
   }
 
   async start () {

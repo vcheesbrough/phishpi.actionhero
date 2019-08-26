@@ -74,8 +74,10 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
         calculator.addOnScheduleChangeListener((channel, schedule, changedBy) =>
           ActionHero.api.autoSchedule.sendScheduleUpdate(channel, changedBy, schedule))
         calculator.addOnIntensityChangeListener((channel, intensity, changedBy) => {
-          const newIntensity = ActionHero.api.autoSchedule.translators[channel].translateNativeValueToPercentage(intensity)
-          ActionHero.api.colourChannels.setIntensity(channel, newIntensity, changedBy)
+          if (ActionHero.api.lightsMode.currentMode === 'auto') {
+            const newIntensity = ActionHero.api.autoSchedule.translators[channel].translateNativeValueToPercentage(intensity)
+            ActionHero.api.colourChannels.setIntensity(channel, newIntensity, changedBy)
+          }
         })
         calculator.addNextIntensityChangeTimeListener(async (channel, nextIntensityChangeTime) => {
           lock.acquire('scheduleTask', async function (done) {
@@ -86,6 +88,14 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
           }, {})
         })
       })
+
+    await ActionHero.api.lightsMode.addLightsModeChangeListener((newMode) => {
+      Enumerable.from(ActionHero.api.autoSchedule.calculators)
+        .select(pair => pair.value)
+        .forEach(calculator => {
+          calculator.checkAndTriggerIntensityEvent(0)
+        })
+    })
   }
 
   async start () {

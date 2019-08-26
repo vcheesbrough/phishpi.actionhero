@@ -12,7 +12,8 @@ module.exports = class TriggerAutoScheduleIntensityChangeTask extends ActionHero
   }
 
   async run (data) {
-    ActionHero.api.autoSchedule.calculators[data.channel].checkAndTriggerIntensityEvent(0)
-    return true
+    if (ActionHero.api.lightsMode.currentMode === 'auto') {
+      ActionHero.api.autoSchedule.calculators[data.channel].checkAndTriggerIntensityEvent(0)
+    }
   }
 }

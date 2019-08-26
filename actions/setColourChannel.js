@@ -29,6 +29,7 @@ module.exports = class SetColourChannelAction extends ActionHero.Action {
         }
       }
     }
+    this.logLevel = 'debug'
   }
 
   async run (data) {

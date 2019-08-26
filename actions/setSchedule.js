@@ -21,9 +21,13 @@ module.exports = class SetScheduleAction extends ActionHero.Action {
         required: true
       }
     }
+    this.logLevel = 'debug'
   }
 
   async run (data) {
+    if (ActionHero.api.lightsMode.currentMode !== 'auto') {
+      throw new Error('Cannot set schedule when not in auto mode')
+    }
     await ActionHero.api.autoSchedule.setSchedule(data.params.channel, data.params.schedule,data.connection.id)
   }
 }

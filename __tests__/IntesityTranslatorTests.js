@@ -15,7 +15,7 @@ describe('intensityTranslator', () => {
   })
   test('native value is not a decimal', () => {
     const target = new IntensityTranslator(255)
-    expect(target.translatePercentValueToNative(0.5)).toEqual(127)
+    expect(target.translatePercentValueToNative(0.5)).toEqual(128)
   })
   test('percentage value is 1.0 for maximum', () => {
     const target = new IntensityTranslator(255)

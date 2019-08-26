@@ -1,5 +1,6 @@
 'use strict'
 const ActionHero = require('actionhero')
+const EventEmitter = require('events')
 
 module.exports = class LightsModeInitialiser extends ActionHero.Initializer {
   constructor () {
@@ -8,6 +9,7 @@ module.exports = class LightsModeInitialiser extends ActionHero.Initializer {
     this.loadPriority = 1000
     this.startPriority = 1000
     this.stopPriority = 1000
+    this._eventEmitter = new EventEmitter()
   }
 
   async initialize () {
@@ -25,6 +27,7 @@ module.exports = class LightsModeInitialiser extends ActionHero.Initializer {
     ActionHero.api.lightsMode.setMode = async (newMode) => {
       if (ActionHero.api.lightsMode.currentMode !== newMode) {
         ActionHero.api.lightsMode.currentMode = newMode
+        this._eventEmitter.emit('lightsmodechange', newMode)
         await ActionHero.api.lightsMode.sendModeNotification(newMode)
       }
     }
@@ -37,6 +40,10 @@ module.exports = class LightsModeInitialiser extends ActionHero.Initializer {
           type: 'notifyLightsMode',
           mode: newMode
         }))
+    }
+
+    ActionHero.api.lightsMode.addLightsModeChangeListener = async (listener) => {
+      this._eventEmitter.addListener('lightsmodechange', listener)
     }
   }
 

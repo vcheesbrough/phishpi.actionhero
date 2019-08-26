@@ -17,6 +17,7 @@ module.exports = class SetLightsModeAction extends ActionHero.Action {
         }
       }
     }
+    this.logLevel = 'debug'
   }
 
   async run (data) {
