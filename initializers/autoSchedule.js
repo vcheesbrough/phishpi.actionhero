@@ -79,7 +79,6 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
         })
         calculator.addNextIntensityChangeTimeListener(async (channel, nextIntensityChangeTime) => {
           lock.acquire('scheduleTask', async function (done) {
-            ActionHero.api.log('Scheduling task for ' + channel + ' in ' + (nextIntensityChangeTime - (new Date().getTime()) + 'ms'))
             await ActionHero.api.tasks.delDelayed('high', 'triggerAutoScheduleIntensityChange', { channel: channel })
             await ActionHero.api.tasks.enqueueAt(nextIntensityChangeTime, 'triggerAutoScheduleIntensityChange', { channel: channel }, 'high')
             done()

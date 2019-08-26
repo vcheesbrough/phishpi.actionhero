@@ -12,7 +12,6 @@ module.exports = class TriggerAutoScheduleIntensityChangeTask extends ActionHero
   }
 
   async run (data) {
-    ActionHero.api.log('Triggering ' + data.channel)
     ActionHero.api.autoSchedule.calculators[data.channel].checkAndTriggerIntensityEvent(0)
     return true
   }

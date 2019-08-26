@@ -8,7 +8,7 @@ module.exports = class IntensityTranslator {
   }
 
   translatePercentValueToNative (percentageValue) {
-    return Math.floor(percentageValue * this.maximumNativeValue)
+    return Math.round(percentageValue * this.maximumNativeValue)
   }
 
   translateNativeValueToPercentage (nativeValue) {

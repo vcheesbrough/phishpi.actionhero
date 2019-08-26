@@ -155,6 +155,10 @@
                 setTimeout(doConnect,1000);
             });
 
+          client.on('say', function (data) {
+            console.log(JSON.parse(data.message))
+          })
+
             let firstConnection = true;
             client.on('connected', function () {
                 console.log('connected');

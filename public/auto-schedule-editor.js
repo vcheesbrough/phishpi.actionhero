@@ -37,7 +37,6 @@ export function registerAutoTimeCanvas (client, containingElement, debounceDelay
   client.on('say', function (data) {
     const messageObj = JSON.parse(data.message)
     if (messageObj.type === 'notifyAutoScheduleChange') {
-      console.info('Received auto schedule update',messageObj)
       channels[messageObj.channel].setSchedule(Enumerable.from(messageObj.schedule)
         .orderBy(scheduleElement => scheduleElement.timeMs),false)
     }
