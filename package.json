@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "actionhero": "latest",
+    "async-lock": "^1.2.2",
     "ioredis": "latest",
+    "linq": "^3.2.0",
     "ws": "latest"
   },
   "devDependencies": {
