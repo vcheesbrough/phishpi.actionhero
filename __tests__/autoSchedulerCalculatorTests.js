@@ -266,6 +266,30 @@ describe('AutoScheduleCalculator', () => {
 
       expect(mockNextIntensityChangeTimeEvent).toHaveBeenCalledWith('colour', 1001)
     })
+    test('real scenario 1', () => {
+      mockTimeOfDayUtc.mockReturnValue(1566734630261)
+      target.setSchedule([
+        {
+          'timeMs': 42926582,
+          'intensity': 0
+        },
+        {
+          'timeMs': 44840506,
+          'intensity': 252
+        },
+        {
+          'timeMs': 68400000,
+          'intensity': 255
+        },
+        {
+          'timeMs': 72000000,
+          'intensity': 0
+        }
+      ])
+
+      expect(mockNextIntensityChangeTimeEvent).toHaveBeenCalled()
+      expect(mockNextIntensityChangeTimeEvent.mock.calls[0][1]).toBeGreaterThan(1566734630261)
+    })
   })
 
 })

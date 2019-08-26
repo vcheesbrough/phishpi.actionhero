@@ -55,7 +55,7 @@ module.exports = class AutosScheduleCalculator {
       this._eventEmitter.emit('intensitychange', this._channel, Math.floor(currentIntensity), changedBy)
     }
 
-    const midnight = Math.floor(currentTime / 86400000)
+    const midnight = Math.floor(currentTime / 86400000) * 86400000
     const thing = Enumerable.repeat({
         timeMs: midnight + (Enumerable.from(this._schedule).last().timeMs - 86400000),
         intensity: Enumerable.from(this._schedule).last().intensity
@@ -76,12 +76,12 @@ module.exports = class AutosScheduleCalculator {
       .skipWhile(pair => pair.first.intensity === currentIntensity && pair.second.intensity === currentIntensity)
       .firstOrDefault()
     if (nextChange) {
-      const factor = Math.abs((nextChange.second.intensity - nextChange.first.intensity) / (nextChange.second.timeMs - nextChange.first.timeMs))
+      const factor = Math.abs((nextChange.second.timeMs - nextChange.first.timeMs) / (nextChange.second.intensity - nextChange.first.intensity))
       let changeTime = nextChange.first.timeMs
       if (currentTime > changeTime) {
         changeTime = currentTime
       }
-      this._eventEmitter.emit('nextintensitychangetime', this._channel, factor + changeTime)
+      this._eventEmitter.emit('nextintensitychangetime', this._channel, Math.floor(factor + changeTime))
     }
 
   }

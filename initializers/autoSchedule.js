@@ -67,12 +67,18 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
     }
 
     Enumerable.from(ActionHero.api.autoSchedule.calculators)
-      .forEach(pair => {
-        pair.value.addOnScheduleChangeListener((channel, schedule, changedBy) =>
+      .select(pair => pair.value)
+      .forEach(calculator => {
+        calculator.addOnScheduleChangeListener((channel, schedule, changedBy) =>
           ActionHero.api.autoSchedule.sendScheduleUpdate(channel, changedBy, schedule))
-        pair.value.addOnIntensityChangeListener((channel, intensity, changedBy) => {
+        calculator.addOnIntensityChangeListener((channel, intensity, changedBy) => {
           const newIntensity = ActionHero.api.autoSchedule.translators[channel].translateNativeValueToPercentage(intensity)
           ActionHero.api.colourChannels.setIntensity(channel, newIntensity, changedBy)
+        })
+        calculator.addNextIntensityChangeTimeListener(async (channel, nextIntensityChangeTime) => {
+          ActionHero.api.log('Scheduling task for ' + channel + ' in ' + (nextIntensityChangeTime - (new Date().getTime()) + 'ms'))
+          await ActionHero.api.tasks.delDelayed('high', 'triggerAutoScheduleIntensityChange', { channel: channel })
+          await ActionHero.api.tasks.enqueueAt(nextIntensityChangeTime, 'triggerAutoScheduleIntensityChange', { channel: channel }, 'high')
         })
       })
   }
