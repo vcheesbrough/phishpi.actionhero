@@ -59,7 +59,11 @@
         .channelDisplay {
             font-size: larger;
             text-align: right;
-            width: 4em;
+            width: 3em;
+        }
+
+        #serverTime {
+            font-size: larger;
         }
 
         #whiteChannelDisplay {
@@ -142,29 +146,31 @@
     <script type="module">
         import * as AutoScheduleEditor from './auto-schedule-editor.js'
         import * as LinkedColourChannelInput from './linked-colour-channel-input.js'
-
-        const setConnectedIconColour = (colour) => document.querySelector('#connectedIcon').style.color = colour
+        import * as ServerTime from './server-time.js'
 
         const debounceTimeMs = 100
         document.addEventListener('DOMContentLoaded', function ()  {
             const client = new ActionheroWebsocketClient();
 
+          ServerTime.registerServerTimeDisplay(client, document.querySelector('#serverTime'))
+
             client.on('disconnected', function () {
                 console.log('disconnected');
-                setConnectedIconColour('red');
                 setTimeout(doConnect,1000);
             });
 
           client.on('say', function (data) {
-            console.log(JSON.parse(data.message))
+            const messageObj = JSON.parse(data.message)
+            console.log(messageObj)
           })
 
             let firstConnection = true;
             client.on('connected', function () {
                 console.log('connected');
-                setConnectedIconColour('green');
                 if(firstConnection)
                 {
+                  ServerTime.connect(client)
+
                   AutoScheduleEditor.registerAutoTimeCanvas(client,document.querySelector('#autoPage'), debounceTimeMs)
 
                   document.querySelectorAll('#rangeSliderRed, #numberRedInput, #rangeSliderBlue, #numberBlueInput, #rangeSliderWhite, #numberWhiteInput')
@@ -205,10 +211,10 @@
     </script>
 </head>
 <body style="background: black;">
-    <div style="position:absolute;top:10px;left:10px;color: white" id="connectedIcon">☍</div>
     <div style="display: flex; flex-direction: column; height: 100%">
 
         <div style="display: flex; padding: 10px">
+            <div style="margin-left: 0em;" id="serverTime">ERROR</div>
             <div style="flex-grow: 1"></div>
             <div id="whiteChannelDisplay" class="channelDisplay" data-colourChannel="white">a</div>
             <div id="redChannelDisplay" class="channelDisplay" data-colourChannel="red">b</div>

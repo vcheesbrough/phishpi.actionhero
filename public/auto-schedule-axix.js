@@ -1,6 +1,7 @@
 'use strict'
 
 import * as AutoScheduleUtils from './auto-schedule-utils.js'
+import * as ServerTime from './server-time.js'
 
 export class AutoScheduleAxis {
   static mouseAxisTickLength = 20
@@ -19,9 +20,9 @@ export class AutoScheduleAxis {
     this.#chartAreaDimensions = dimensions
     this.#axisCanvas = AutoScheduleUtils.createCanvasAndAddToContainingElement('axisCanvas',2, containerElement)
     this.#mouseCanvas = AutoScheduleUtils.createCanvasAndAddToContainingElement('mouseCanvas',1, containerElement)
-    setTimeout(() => {
+    ServerTime.addServerTimeChangeListener(() => {
       this.drawAxis()
-    },60000)
+    })
   }
 
   get mouseCanvas() {
@@ -79,16 +80,18 @@ export class AutoScheduleAxis {
         ctx.lineTo(x, y + 10)
         ctx.stroke()
       })
-    const timeMs = new Date().getTime() % 86400000
-    ctx.beginPath()
-    ctx.lineWidth = 1
-    ctx.strokeStyle = AutoScheduleAxis.currentTimeColour
-    ctx.setLineDash([5, 3])
-    const x = AutoScheduleUtils.translateTimeMsToX(ctx, timeMs, this.#chartAreaDimensions)
-    ctx.moveTo(x, AutoScheduleUtils.translateIntensityToY(ctx, 0, this.#chartAreaDimensions))
-    ctx.lineTo(x, AutoScheduleUtils.translateIntensityToY(ctx, 1.0, this.#chartAreaDimensions))
-    ctx.stroke()
-    ctx.restore()
+    if (ServerTime.getLastServerTime()) {
+      const timeMs = ServerTime.getLastServerTime() % 86400000
+      ctx.beginPath()
+      ctx.lineWidth = 1
+      ctx.strokeStyle = AutoScheduleAxis.currentTimeColour
+      ctx.setLineDash([5, 3])
+      const x = AutoScheduleUtils.translateTimeMsToX(ctx, timeMs, this.#chartAreaDimensions)
+      ctx.moveTo(x, AutoScheduleUtils.translateIntensityToY(ctx, 0, this.#chartAreaDimensions))
+      ctx.lineTo(x, AutoScheduleUtils.translateIntensityToY(ctx, 1.0, this.#chartAreaDimensions))
+      ctx.stroke()
+      ctx.restore()
+    }
   }
 
   onResize() {

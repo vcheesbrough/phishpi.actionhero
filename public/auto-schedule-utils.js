@@ -1,5 +1,4 @@
 'use strict'
-
 export const resizeCanvasToFitInParent = (canvas) => {
   canvas.width = canvas.parentElement.clientWidth
   canvas.height = canvas.parentElement.clientHeight
