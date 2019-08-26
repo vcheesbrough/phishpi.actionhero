@@ -3,6 +3,8 @@ const ActionHero = require('actionhero')
 const Enumerable = require('linq/linq.js');
 const AutoScheduleCalculator = require('../modules/autoScheduleCalculator')
 const IntensityTranslator = require('../modules/intensityTranslator')
+const AsyncLock = require('async-lock')
+const lock = new AsyncLock()
 
 const parseTimeToMs = (s) => {
   const re = /(\d{2}):(\d{2}):(\d{2})(\.(\d{3}))?/
@@ -76,9 +78,13 @@ module.exports = class AutoScheduleInitializer extends ActionHero.Initializer {
           ActionHero.api.colourChannels.setIntensity(channel, newIntensity, changedBy)
         })
         calculator.addNextIntensityChangeTimeListener(async (channel, nextIntensityChangeTime) => {
-          ActionHero.api.log('Scheduling task for ' + channel + ' in ' + (nextIntensityChangeTime - (new Date().getTime()) + 'ms'))
-          await ActionHero.api.tasks.delDelayed('high', 'triggerAutoScheduleIntensityChange', { channel: channel })
-          await ActionHero.api.tasks.enqueueAt(nextIntensityChangeTime, 'triggerAutoScheduleIntensityChange', { channel: channel }, 'high')
+          lock.acquire('scheduleTask', async function (done) {
+            ActionHero.api.log('Scheduling task for ' + channel + ' in ' + (nextIntensityChangeTime - (new Date().getTime()) + 'ms'))
+            await ActionHero.api.tasks.delDelayed('high', 'triggerAutoScheduleIntensityChange', { channel: channel })
+            await ActionHero.api.tasks.enqueueAt(nextIntensityChangeTime, 'triggerAutoScheduleIntensityChange', { channel: channel }, 'high')
+            done()
+          }, function (err, ret) {
+          }, {})
         })
       })
   }
