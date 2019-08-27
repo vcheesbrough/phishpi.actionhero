@@ -7,9 +7,9 @@ import { debounce } from './debounce.js'
 
 export function registerAutoTimeCanvas (client, containingElement, debounceDelay) {
   const chartAreaDimensions = {
-    topGutter: 20,
+    topGutter: 10,
     bottomGutter:  50,
-    rightGutter:  20,
+    rightGutter: 0,
     leftGutter: 80
   }
 

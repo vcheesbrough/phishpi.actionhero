@@ -17,6 +17,7 @@
             width: 100%;
             flex-grow: 1;
         }
+
     </style>
     <style type="text/css">
         .lightsModeButton {
@@ -114,41 +115,16 @@
     <script src="/public/javascript/ActionheroWebsocketClient.min.js" type="text/javascript"></script>
     <link href="https://www.w3schools.com/w3css/4/w3.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-    <script language="JavaScript" src="Grouped-Toggle-Buttons-jQuery-multibutton/jquery.multibutton.js" type="text/javascript"></script>
-    <link href="Grouped-Toggle-Buttons-jQuery-multibutton/jquery.multibutton.css" rel="stylesheet" type="text/css">
     <script src="linq.js" type="text/javascript"></script>
     <script src="https://momentjs.com/downloads/moment.min.js"></script>
-
-    <script type="text/javascript">
-        function registerLinkedModeSwitch(client,onModeChangeFunction) {
-            var lastMode;
-            var multiButton = $('.lightsModeMultiButton').multiButton({
-                join:    true,
-                onClick: function(el,value) {
-                    $('span#lightsModeMultiButton-info').text(value);
-                    if(lastMode != value)
-                    {
-                        client.action('setLightsMode',{mode: value})
-                        lastMode = value;
-                    }
-                }
-            });
-            client.on('say', function (data) {
-                const messageObj = JSON.parse(data.message);
-                if(messageObj.type === 'notifyLightsMode') {
-                    lastMode = messageObj.mode
-                    multiButton.setValue(messageObj.mode);
-                    onModeChangeFunction(messageObj.mode);
-                }
-            });
-        }
-    </script>
+    <script src="https://kit.fontawesome.com/59f416da79.js"></script>
     <script type="module">
-        import * as AutoScheduleEditor from './auto-schedule-editor.js'
-        import * as LinkedColourChannelInput from './linked-colour-channel-input.js'
-        import * as ServerTime from './server-time.js'
+      import * as AutoScheduleEditor from './auto-schedule-editor.js'
+      import * as LinkedColourChannelInput from './linked-colour-channel-input.js'
+      import * as ServerTime from './server-time.js'
+      import * as LightsModeRadio from './lights-mode-radio.js'
 
-        const debounceTimeMs = 100
+      const debounceTimeMs = 100
         document.addEventListener('DOMContentLoaded', function ()  {
             const client = new ActionheroWebsocketClient();
 
@@ -171,7 +147,10 @@
                 {
                   ServerTime.connect(client)
 
-                  AutoScheduleEditor.registerAutoTimeCanvas(client,document.querySelector('#autoPage'), debounceTimeMs)
+                  AutoScheduleEditor.registerAutoTimeCanvas(client, document.querySelector('#autoScheduleCanvasContainer'), debounceTimeMs)
+
+                  document.querySelectorAll('#lights-mode-radio-off, #lights-mode-radio-manual, #lights-mode-radio-auto')
+                    .forEach(element => LightsModeRadio.registerLightsModeRadioButton(client, element))
 
                   document.querySelectorAll('#rangeSliderRed, #numberRedInput, #rangeSliderBlue, #numberBlueInput, #rangeSliderWhite, #numberWhiteInput')
                     .forEach(element => LinkedColourChannelInput.registerColourChannelInput(client, element,debounceTimeMs , element.getAttribute("data-colourChannel")));
@@ -179,11 +158,11 @@
                   document.querySelectorAll('#whiteChannelDisplay, #redChannelDisplay, #blueChannelDisplay')
                     .forEach(element => LinkedColourChannelInput.registerColourChannelDisplay(client, element, element.getAttribute("data-colourChannel")));
 
-                  registerLinkedModeSwitch(client, mode => {
+                  LightsModeRadio.registerOnLightsModeChange(client, mode => {
                     document.querySelector('#channelsPage').style.display = mode === 'manual' ? 'block' : 'none'
                     document.querySelector('#autoPage').style.display = mode === 'auto' ? 'block' : 'none'
-                  });
-                    firstConnection = false;
+                  })
+                  firstConnection = false
                 }
             });
 
@@ -220,11 +199,55 @@
             <div id="redChannelDisplay" class="channelDisplay" data-colourChannel="red">b</div>
             <div id="blueChannelDisplay" class="channelDisplay" data-colourChannel="blue" style="margin-right: 2em;">c</div>
 
-            <ul class="lightsModeMultiButton" >
-                <li rel="off" class="lightsModeButton">Off</li>
-                <li rel="manual" class="lightsModeButton">Manual</li>
-                <li rel="auto" class="lightsModeButton">Auto</li>
-            </ul>
+            <style type="text/css">
+                .lights-mode-radio-container input {
+                    position: absolute !important;
+                    clip: rect(0, 0, 0, 0);
+                    height: 1px;
+                    width: 1px;
+                    border: 0;
+                    overflow: hidden;
+                }
+
+                .lights-mode-radio-container label {
+                    background-color: #252525;
+                    color: white;
+                    font-size: 20px;
+                    line-height: 1;
+                    text-align: center;
+                    padding: 8px 8px;
+                    margin-right: -1px;
+                    border: 1px solid rgba(0, 0, 0, 0.2);
+                    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+                    transition: all 0.1s ease-in-out;
+                }
+
+                .lights-mode-radio-container label:hover {
+                    cursor: pointer;
+                }
+
+                .lights-mode-radio-container input:checked + label {
+                    background-color: #eeeeee;
+                    color: black;
+                    box-shadow: none;
+                }
+
+                .lights-mode-radio-container label:first-of-type {
+                    border-radius: 6px 0 0 6px;
+                }
+
+                .lights-mode-radio-container label:last-of-type {
+                    border-radius: 0 6px 6px 0;
+                }
+            </style>
+            <div style="display: flex; flex-direction: row;" class="lights-mode-radio-container">
+                <input type="radio" id="lights-mode-radio-off" name="lights-mode-radio" value="off" checked/>
+                <label class="fas fa-power-off" for="lights-mode-radio-off"></label>
+                <input type="radio" id="lights-mode-radio-manual" name="lights-mode-radio" value="manual"/>
+                <label class="fas fa-sliders-h" for="lights-mode-radio-manual"></label>
+                <input type="radio" id="lights-mode-radio-auto" name="lights-mode-radio" value="auto"/>
+                <label class="far fa-clock" for="lights-mode-radio-auto"></label>
+            </div>
         </div>
 
         <div id="channelsPage" class="pagePanel">
@@ -249,6 +272,57 @@
         </div>
 
         <div id="autoPage" class="pagePanel">
+            <div style="width: 100%;height: 100%;display: flex;">
+                <div id="autoScheduleCanvasContainer" style="height: 100%;width: 100%;"></div>
+                <div style="margin-top: 10px; margin-right: 10px;display: flex; flex-direction: column;">
+                    <style type="text/css">
+                        .auto-schedule-radio-container input {
+                            position: absolute !important;
+                            clip: rect(0, 0, 0, 0);
+                            height: 1px;
+                            width: 1px;
+                            border: 0;
+                            overflow: hidden;
+                        }
+
+                        .auto-schedule-radio-container label {
+                            background-color: #252525;
+                            color: white;
+                            font-size: 20px;
+                            line-height: 1;
+                            text-align: center;
+                            padding: 8px 8px;
+                            margin-right: -1px;
+                            border: 1px solid rgba(0, 0, 0, 0.2);
+                            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+                            transition: all 0.1s ease-in-out;
+                        }
+
+                        .auto-schedule-radio-container label:hover {
+                            cursor: pointer;
+                        }
+
+                        .auto-schedule-radio-container input:checked + label {
+                            background-color: #eeeeee;
+                            color: black;
+                            box-shadow: none;
+                        }
+
+                        .auto-schedule-radio-container label {
+                            border-radius: 0 6px 6px 0;
+                            padding-left: 15px;
+                        }
+                    </style>
+                    <div style="display: flex; flex-direction: column;" class="auto-schedule-radio-container">
+                        <input type="radio" id="auto-schedule-radio-chart" name="auto-schedule-radio" value="chart"
+                               checked/>
+                        <label class="fas fa-chart-line" for="auto-schedule-radio-chart"></label>
+                        <input type="radio" id="auto-schedule-radio-grid" name="auto-schedule-radio" value="grid"/>
+                        <label class="fas fa-border-all" for="auto-schedule-radio-grid"></label>
+                    </div>
+                    <div></div>
+                </div>
+            </div>
         </div>
     </div>
 </body>
