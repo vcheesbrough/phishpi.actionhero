@@ -4,7 +4,6 @@ const EventEmitter = require('events')
 const Enumerable = require('linq/linq.js')
 
 module.exports = class AutosScheduleCalculator {
-
   constructor (channel, timeOfDayUtc) {
     this._eventEmitter = new EventEmitter()
     this._channel = channel
@@ -34,14 +33,14 @@ module.exports = class AutosScheduleCalculator {
     const itemBeforeCurrentTimeOfDay = Enumerable.from(this._schedule)
       .insert(0, Enumerable.repeat({
         timeMs: Enumerable.from(this._schedule).last().timeMs - 86400000,
-        intensity: Enumerable.from(this._schedule).last().intensity,
+        intensity: Enumerable.from(this._schedule).last().intensity
       }, 1))
       .takeWhile(scheduleItem => scheduleItem.timeMs < currentTimeOfDay)
       .last()
     const itemsOnOrAfterCurrentTimeOfDay = Enumerable.from(this._schedule)
       .insert(this._schedule.length, Enumerable.repeat({
         timeMs: Enumerable.from(this._schedule).first().timeMs + 86400000,
-        intensity: Enumerable.from(this._schedule).first().intensity,
+        intensity: Enumerable.from(this._schedule).first().intensity
       }, 1))
       .skipWhile(scheduleItem => scheduleItem.timeMs <= currentTimeOfDay)
 
@@ -57,16 +56,16 @@ module.exports = class AutosScheduleCalculator {
 
     const midnight = Math.floor(currentTime / 86400000) * 86400000
     const thing = Enumerable.repeat({
-        timeMs: midnight + (Enumerable.from(this._schedule).last().timeMs - 86400000),
-        intensity: Enumerable.from(this._schedule).last().intensity
-      }, 1)
+      timeMs: midnight + (Enumerable.from(this._schedule).last().timeMs - 86400000),
+      intensity: Enumerable.from(this._schedule).last().intensity
+    }, 1)
       .concat(Enumerable.from(this._schedule).select(scheduleItem => ({
         timeMs: midnight + scheduleItem.timeMs,
-        intensity: scheduleItem.intensity,
+        intensity: scheduleItem.intensity
       })))
       .concat(Enumerable.from(this._schedule).select(scheduleItem => ({
         timeMs: midnight + scheduleItem.timeMs + 86400000,
-        intensity: scheduleItem.intensity,
+        intensity: scheduleItem.intensity
       })))
     const nextChange = Enumerable.repeat(undefined, 1)
       .concat(thing)
@@ -83,7 +82,6 @@ module.exports = class AutosScheduleCalculator {
       }
       this._eventEmitter.emit('nextintensitychangetime', this._channel, Math.floor(factor + changeTime))
     }
-
   }
 
   addOnIntensityChangeListener (func) {
