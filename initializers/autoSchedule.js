@@ -13,7 +13,7 @@ const parseTimeToMs = (s) => {
     throw new Error('Cannot parse \'' + s + '\'')
   }
   const milliseconds = result[5]
-  const date = new Date(1970, 0, 1, result[1], result[2], result[3], milliseconds || 0)
+  const date = new Date(Date.UTC(1970, 0, 1, result[1], result[2], result[3], milliseconds || 0))
   return date.getTime()
 }
 
