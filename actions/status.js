@@ -15,9 +15,9 @@ module.exports = class RandomNumber extends ActionHero.Action {
     this.name = 'status'
     this.description = 'I will return some basic information about the API'
     this.outputExample = {
-      'id': '192.168.2.11',
-      'actionheroVersion': '9.4.1',
-      'uptime': 10469
+      id: '192.168.2.11',
+      actionheroVersion: '9.4.1',
+      uptime: 10469
     }
   }
 
@@ -26,23 +26,23 @@ module.exports = class RandomNumber extends ActionHero.Action {
     data.response.consumedMemoryMB = consumedMemoryMB
     if (consumedMemoryMB > maxMemoryAlloted) {
       data.response.nodeStatus = data.connection.localize('Unhealthy')
-      data.response.problems.push(data.connection.localize(['Using more than {{maxMemoryAlloted}} MB of RAM/HEAP', {maxMemoryAlloted: maxMemoryAlloted}]))
+      data.response.problems.push(data.connection.localize(['Using more than {{maxMemoryAlloted}} MB of RAM/HEAP', { maxMemoryAlloted: maxMemoryAlloted }]))
     }
   }
 
   async checkEventLoop (data) {
     const api = ActionHero.api
-    let eventLoopDelay = await api.utils.eventLoopDelay(10000)
+    const eventLoopDelay = await api.utils.eventLoopDelay(10000)
     data.response.eventLoopDelay = eventLoopDelay
     if (eventLoopDelay > maxEventLoopDelay) {
       data.response.nodeStatus = data.connection.localize('Node Unhealthy')
-      data.response.problems.push(data.connection.localize(['EventLoop Blocked for more than {{maxEventLoopDelay}} ms', {maxEventLoopDelay: maxEventLoopDelay}]))
+      data.response.problems.push(data.connection.localize(['EventLoop Blocked for more than {{maxEventLoopDelay}} ms', { maxEventLoopDelay: maxEventLoopDelay }]))
     }
   }
 
   async checkResqueQueues (data) {
     const api = ActionHero.api
-    let details = await api.tasks.details()
+    const details = await api.tasks.details()
     let length = 0
     Object.keys(details.queues).forEach((q) => {
       length += details.queues[q].length
@@ -52,7 +52,7 @@ module.exports = class RandomNumber extends ActionHero.Action {
 
     if (length > maxResqueQueueLength) {
       data.response.nodeStatus = data.connection.localize('Node Unhealthy')
-      data.response.problems.push(data.connection.localize(['Resque Queues over {{maxResqueQueueLength}} jobs', {maxResqueQueueLength: maxResqueQueueLength}]))
+      data.response.problems.push(data.connection.localize(['Resque Queues over {{maxResqueQueueLength}} jobs', { maxResqueQueueLength: maxResqueQueueLength }]))
     }
   }
 

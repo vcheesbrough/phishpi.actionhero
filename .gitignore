@@ -21,4 +21,4 @@ cache.dump
 
 # Editor-specific
 /nbproject/*
-/.idea/*
+/.idea/workspace.xml

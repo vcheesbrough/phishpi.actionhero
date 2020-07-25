@@ -1,136 +1,329 @@
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <meta http-equiv="content-language" content="en" />
-    <meta name="description" content="ActionHero.js" />
-    <link rel="stylesheet" href="/public/css/cosmo.css" type="text/css">
-    <link rel="icon" href="/public/favicon.ico">
-    <title>ActionHero.js</title>
-
-    <script src="/public/javascript/ActionheroWebsocketClient.min.js"></script>
-  </head>
-
-  <body>
-    <div class="alert alert-warning" style="display:none; font-weight:bold; position:fixed; top: 0px; left: 0px; width: 100%; z-index:9999; " id="error-container">
-      <p id="error"/>
-    </div>
-
-    <div class="container">
-      <br />
-      <div class="jumbotron">
-        <div class="row">
-          <div class="col-md-4">
-            <img src="/public/logo/actionhero.png" height="300" />
-          </div>
-          <div class="col-md-8">
-            <h1>Your ActionHero Server is working.</h1>
-            <h2>Congratulations!</h2>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-
-        <div class="col-md-4">
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">This Server</h3>
-            </div>
-            <div class="panel-body">
-              <pre>
-  Server Name:        <span class="right" id="serverName"></span>
-  API Version:        <span class="right" id="serverVersion"></span>
-  Actionhero Version  <span class="right" id="actionheroVersion"></span>
-  Uptime (min):       <span class="right" id="uptime"></span>
-              </pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-8">
-          <div class="row">
-
-            <div class="col-md-12">
-              <div class="panel panel-default">
-                <div class="panel-heading">
-                  <h3 class="panel-title">About ActionHero</h3>
-                </div>
-                <div class="panel-body">
-                  <p>ActionHero.js is a multi-transport API Server with integrated cluster capabilities and delayed tasks.</p>
-                  <p>ActionHero was built from the ground up to include all the features you expect from a modern API framework. This includes all the features listed below and more.  ActionHero also knows when to get out of the way to allow you to customize your stack to fit your needs.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <a href="/chat.html" class="btn btn-primary">Try a realtime-chat with websockets</a>
-            </div>
-
-            <div class="col-md-6">
-              <a href="http://www.actionherojs.com" class="btn btn-primary">Learn More about ActionHero</a>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <hr />
-
-      <h2>Actions on This Server:</h2>
-      <row id="actions"></row>
-
-    </div>
-
-    <script type="text/javascript">
-      var populateStatus = function(data){
-        if(data.serverInformation){
-          document.getElementById('serverVersion').innerHTML = data.serverInformation.apiVersion;
-          document.getElementById('serverName').innerHTML = data.serverInformation.serverName;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slider</title>
+    <style type="text/css">
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding:0;
+            overflow:hidden;
         }
-        document.getElementById('actionheroVersion').innerHTML = data.actionheroVersion;
-        document.getElementById('uptime').innerHTML = Math.round( data.uptime / 1000 / 60 );
-      }
-
-      var populateDocumentation = function(data){
-        for(var actionName in data.documentation){
-          for(var version in data.documentation[actionName]){
-            var action = data.documentation[actionName][version];
-            var row = '';
-            row += '<div class="col-md-6">';
-            row += '  <div class="panel panel-default">';
-            row += '    <div class="panel-heading">';
-            row += '      <a href="/api/' + action.name + '?apiVersion=' + version + '"><h3 class="panel-title">' + action.name + ' (v' + version + ')</h3></a>';
-            row += '    </div>';
-            row += '    <div class="panel-body">';
-            row += '      <p><strong>Description: </strong>' + action.description + '</p>';
-            row += '      <p><strong>Inputs</strong>: <pre>' + JSON.stringify(action.inputs, null, 4) + '</pre></p>';
-            row += '      <p><strong>Output Example</strong>: <pre>' + JSON.stringify(action.outputExample, null, 4) + '</pre></p>';
-            row += '    </div>';
-            row += '  </div>';
-            row += '</div>';
-
-            document.getElementById('actions').innerHTML += row;
-          }
+        .pagePanel {
+            height: 100%;
+            width: 100%;
+            flex-grow: 1;
         }
-      }
 
-      var renderError = function (error) {
-        console.error(error)
-        document.getElementById('error').innerHTML = error.toString();
-        document.getElementById('error-container').style.display = 'block';
-      }
+    </style>
+    <style type="text/css">
+        .lightsModeButton {
+            width: 60px;
+            text-align: center;
+        }
+        .channelContainer {
+            width: 100%;
+            display: flex;
+            padding: 20px;
+        }
 
-      var client = new ActionheroWebsocketClient();
-      client.action('showDocumentation', function(data){
-        if(data.error){ return renderError(data.error); }
-        populateDocumentation(data)
-      });
+        .sliderContainer {
+            margin-top: 5px;
+            flex-grow: 1;
+            padding: 10px;
+        }
 
-      client.action('status', function(data){
-        if(data.error){ return renderError(data.error); }
-        populateStatus(data)
-      });
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 15px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        .numberInput {
+            border: none;
+            width: 3em;
+            display: inline-block;
+            font-size: larger;
+            background: black;
+            color: white;
+        }
+
+        .channelDisplay {
+            font-size: larger;
+            text-align: right;
+            width: 3em;
+        }
+
+        #serverTime {
+            font-size: larger;
+        }
+
+        #whiteChannelDisplay {
+            color: white;
+        }
+        #redChannelDisplay {
+            color: red;
+        }
+        #blueChannelDisplay {
+            color: blue;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .sliderRed::-webkit-slider-thumb {
+            background: red;
+        }
+
+        .sliderRed::-moz-range-thumb {
+            background: red;
+        }
+
+        .sliderBlue::-webkit-slider-thumb {
+            background: blue;
+        }
+
+        .sliderBlue::-moz-range-thumb {
+            background: blue;
+        }
+
+        .sliderWhite::-webkit-slider-thumb {
+            background: white;
+        }
+
+        .sliderWhite::-moz-range-thumb {
+            background: white;
+        }
+
+    </style>
+    <script src="/public/javascript/ActionheroWebsocketClient.min.js" type="text/javascript"></script>
+    <link href="https://www.w3schools.com/w3css/4/w3.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="linq.js" type="text/javascript"></script>
+    <script src="https://momentjs.com/downloads/moment.min.js"></script>
+    <script src="https://kit.fontawesome.com/59f416da79.js"></script>
+    <script type="module">
+      import * as AutoScheduleEditor from './auto-schedule-editor.js'
+      import * as LinkedColourChannelInput from './linked-colour-channel-input.js'
+      import * as ServerTime from './server-time.js'
+      import * as LightsModeRadio from './lights-mode-radio.js'
+
+      const debounceTimeMs = 100
+        document.addEventListener('DOMContentLoaded', function ()  {
+            const client = new ActionheroWebsocketClient();
+
+          ServerTime.registerServerTimeDisplay(client, document.querySelector('#serverTime'))
+
+            client.on('disconnected', function () {
+                console.log('disconnected');
+                setTimeout(doConnect,1000);
+            });
+
+          client.on('say', function (data) {
+            const messageObj = JSON.parse(data.message)
+            console.log(messageObj)
+          })
+
+            let firstConnection = true;
+            client.on('connected', function () {
+                console.log('connected');
+                if(firstConnection)
+                {
+                  ServerTime.connect(client)
+
+                  AutoScheduleEditor.registerAutoTimeCanvas(client, document.querySelector('#autoScheduleCanvasContainer'), debounceTimeMs)
+
+                  document.querySelectorAll('#lights-mode-radio-off, #lights-mode-radio-manual, #lights-mode-radio-auto')
+                    .forEach(element => LightsModeRadio.registerLightsModeRadioButton(client, element))
+
+                  document.querySelectorAll('#rangeSliderRed, #numberRedInput, #rangeSliderBlue, #numberBlueInput, #rangeSliderWhite, #numberWhiteInput')
+                    .forEach(element => LinkedColourChannelInput.registerColourChannelInput(client, element,debounceTimeMs , element.getAttribute("data-colourChannel")));
+
+                  document.querySelectorAll('#whiteChannelDisplay, #redChannelDisplay, #blueChannelDisplay')
+                    .forEach(element => LinkedColourChannelInput.registerColourChannelDisplay(client, element, element.getAttribute("data-colourChannel")));
+
+                  LightsModeRadio.registerOnLightsModeChange(client, mode => {
+                    document.querySelector('#channelsPage').style.display = mode === 'manual' ? 'block' : 'none'
+                    document.querySelector('#autoPage').style.display = mode === 'auto' ? 'block' : 'none'
+                  })
+                  firstConnection = false
+                }
+            });
+
+            client.on('reconnect', function () {
+                console.log('reconnect');
+            });
+
+            client.on('reconnecting', function () {
+                console.log('reconnecting');
+            });
+
+            const doConnect = () => {
+                client.connect(function (error, details) {
+                    if (error) {
+                        console.error(error);
+                        alert(error);
+                    }
+                    else {
+                      client.roomAdd('defaultRoom')
+                    }
+                });
+            }
+            doConnect();
+        });
     </script>
+</head>
+<body style="background: black;">
+    <div style="display: flex; flex-direction: column; height: 100%">
 
-  </body>
+        <div style="display: flex; padding: 10px">
+            <div style="margin-left: 0em;" id="serverTime">ERROR</div>
+            <div style="flex-grow: 1"></div>
+            <div id="whiteChannelDisplay" class="channelDisplay" data-colourChannel="white">a</div>
+            <div id="redChannelDisplay" class="channelDisplay" data-colourChannel="red">b</div>
+            <div id="blueChannelDisplay" class="channelDisplay" data-colourChannel="blue" style="margin-right: 2em;">c</div>
+
+            <style type="text/css">
+                .lights-mode-radio-container input {
+                    position: absolute !important;
+                    clip: rect(0, 0, 0, 0);
+                    height: 1px;
+                    width: 1px;
+                    border: 0;
+                    overflow: hidden;
+                }
+
+                .lights-mode-radio-container label {
+                    background-color: #252525;
+                    color: white;
+                    font-size: 20px;
+                    line-height: 1;
+                    text-align: center;
+                    padding: 8px 8px;
+                    margin-right: -1px;
+                    border: 1px solid rgba(0, 0, 0, 0.2);
+                    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+                    transition: all 0.1s ease-in-out;
+                }
+
+                .lights-mode-radio-container label:hover {
+                    cursor: pointer;
+                }
+
+                .lights-mode-radio-container input:checked + label {
+                    background-color: #eeeeee;
+                    color: black;
+                    box-shadow: none;
+                }
+
+                .lights-mode-radio-container label:first-of-type {
+                    border-radius: 6px 0 0 6px;
+                }
+
+                .lights-mode-radio-container label:last-of-type {
+                    border-radius: 0 6px 6px 0;
+                }
+            </style>
+            <div style="display: flex; flex-direction: row;" class="lights-mode-radio-container">
+                <input type="radio" id="lights-mode-radio-off" name="lights-mode-radio" value="off" checked/>
+                <label class="fas fa-power-off" for="lights-mode-radio-off"></label>
+                <input type="radio" id="lights-mode-radio-manual" name="lights-mode-radio" value="manual"/>
+                <label class="fas fa-sliders-h" for="lights-mode-radio-manual"></label>
+                <input type="radio" id="lights-mode-radio-auto" name="lights-mode-radio" value="auto"/>
+                <label class="far fa-clock" for="lights-mode-radio-auto"></label>
+            </div>
+        </div>
+
+        <div id="channelsPage" class="pagePanel">
+            <div class="channelContainer">
+                <div class="sliderContainer">
+                    <input disabled data-colourChannel="white" type="range" min="0" max="100" value="50" class="slider sliderWhite" id="rangeSliderWhite" >
+                </div>
+                <input disabled data-colourChannel="white" type="number" min="0" max="100" value="50" class="numberInput" id="numberWhiteInput">
+            </div>
+            <div class="channelContainer">
+                <div class="sliderContainer">
+                    <input disabled data-colourChannel="red" type="range" min="0" max="100" value="50" class="slider sliderRed" id="rangeSliderRed" >
+                </div>
+                <input disabled data-colourChannel="red" type="number" min="0" max="100" value="50" class="numberInput" id="numberRedInput">
+            </div>
+            <div class="channelContainer">
+                <div class="sliderContainer">
+                    <input disabled data-colourChannel="blue" type="range" min="0" max="100" value="50" class="slider sliderBlue" id="rangeSliderBlue" >
+                </div>
+                <input disabled data-colourChannel="blue" type="number" min="0" max="100" value="50" class="numberInput" id="numberBlueInput">
+            </div>
+        </div>
+
+        <div id="autoPage" class="pagePanel">
+            <div style="width: 100%;height: 100%;display: flex;">
+                <div id="autoScheduleCanvasContainer" style="height: 100%;width: 100%;"></div>
+                <div style="margin-top: 10px; margin-right: 10px;display: flex; flex-direction: column;">
+                    <style type="text/css">
+                        .auto-schedule-radio-container input {
+                            position: absolute !important;
+                            clip: rect(0, 0, 0, 0);
+                            height: 1px;
+                            width: 1px;
+                            border: 0;
+                            overflow: hidden;
+                        }
+
+                        .auto-schedule-radio-container label {
+                            background-color: #252525;
+                            color: white;
+                            font-size: 20px;
+                            line-height: 1;
+                            text-align: center;
+                            padding: 8px 8px;
+                            margin-right: -1px;
+                            border: 1px solid rgba(0, 0, 0, 0.2);
+                            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+                            transition: all 0.1s ease-in-out;
+                        }
+
+                        .auto-schedule-radio-container label:hover {
+                            cursor: pointer;
+                        }
+
+                        .auto-schedule-radio-container input:checked + label {
+                            background-color: #eeeeee;
+                            color: black;
+                            box-shadow: none;
+                        }
+
+                        .auto-schedule-radio-container label {
+                            border-radius: 0 6px 6px 0;
+                            padding-left: 15px;
+                        }
+                    </style>
+                    <div style="display: flex; flex-direction: column;" class="auto-schedule-radio-container">
+                        <input type="radio" id="auto-schedule-radio-chart" name="auto-schedule-radio" value="chart"
+                               checked/>
+                        <label class="fas fa-chart-line" for="auto-schedule-radio-chart"></label>
+                        <input type="radio" id="auto-schedule-radio-grid" name="auto-schedule-radio" value="grid"/>
+                        <label class="fas fa-border-all" for="auto-schedule-radio-grid"></label>
+                    </div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
 </html>
