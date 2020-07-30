@@ -27,6 +27,7 @@ int main(int argc, char **argv)
     UNITY_BEGIN();
 
     common();
+    RUN_TEST(SimpleComponentTests::dependencyIsInvoked);
 
     UNITY_END();
 
