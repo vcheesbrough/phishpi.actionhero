@@ -3,18 +3,13 @@
 #include "IMockableSerial.h"
 
 namespace phishpi {
+    template <unsigned char TBufferSize>
     class SerialMessageReadBuffer {
         public:
 
-        SerialMessageReadBuffer(IMockableSerial& mockableSerial,unsigned char bufferSize) 
-            : mockableSerial(mockableSerial), 
-            serialReadBuffer(new char[bufferSize+1]), 
-            bufferSize(bufferSize+1) { }
+        SerialMessageReadBuffer(IMockableSerial& mockableSerial) 
+            : mockableSerial(mockableSerial) { }
 
-        ~SerialMessageReadBuffer() {
-            delete serialReadBuffer;
-        }
-        
         char * tryGetNextCommand() {
             while(mockableSerial.available() > 0) {
                 char singleByte = mockableSerial.read();
@@ -24,7 +19,7 @@ namespace phishpi {
                         reset();
                         return serialReadBuffer;
                     } else {
-                        if(nextReadBufferIndex < bufferSize - 1) {
+                        if(nextReadBufferIndex < TBufferSize) {
                             serialReadBuffer[nextReadBufferIndex++] = singleByte;
                         } else {
                             reset();
@@ -50,8 +45,7 @@ namespace phishpi {
         }
 
         IMockableSerial& mockableSerial;
-        char*  serialReadBuffer;
-        const unsigned char bufferSize;
+        char  serialReadBuffer[TBufferSize];
         unsigned char nextReadBufferIndex=0;
         bool inCommand = false;
 

@@ -6,7 +6,7 @@
 
 namespace phishpi {
     
-    template <char TBufferSize>
+    template <unsigned char TBufferSize>
     class SerialMessageWriteBuffer {
         public:
         SerialMessageWriteBuffer(phishpi::IMockableSerial & serial,phishpi::IRingBuffer<char,TBufferSize> & ringBuffer) :

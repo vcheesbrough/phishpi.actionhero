@@ -7,7 +7,7 @@
 #define WRITE_BUFFER_SIZE  100
 
 phishpi::ArduinoSerial arduinoSerial;
-phishpi::SerialMessageReadBuffer SerialMessageReadBuffer(arduinoSerial, READ_BUFFER_SIZE);
+phishpi::SerialMessageReadBuffer<READ_BUFFER_SIZE> serialMessageReadBuffer(arduinoSerial);
 phishpi::RingBuffer<char,WRITE_BUFFER_SIZE> serialWriteRingBuffer;
 phishpi::SerialMessageWriteBuffer<WRITE_BUFFER_SIZE> serialMessageWriteBuffer(arduinoSerial,serialWriteRingBuffer);
 
@@ -44,7 +44,7 @@ void dispatchCommand(char * command) {
 
 void loop() {
   serialMessageWriteBuffer.trySendMessages();
-  char * command = SerialMessageReadBuffer.tryGetNextCommand();
+  char * command = serialMessageReadBuffer.tryGetNextCommand();
   if(command != nullptr) {
     dispatchCommand(command);
   }
