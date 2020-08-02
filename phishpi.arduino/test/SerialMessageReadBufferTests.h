@@ -1,4 +1,4 @@
-#include "SerialCommandReadBuffer.h"
+#include "SerialMessageReadBuffer.h"
 #include <unity.h>
 #include "IMockableSerial.h"
 
@@ -6,11 +6,11 @@
 #include "fakeit.h"
 using namespace fakeit;
 
-namespace SerialCommandReadBufferTests {
+namespace SerialMessageReadBufferTests {
 
     void givenNoAvailable_thenReadNotCalled() {
         Mock<phishpi::IMockableSerial> mockSerial;
-        phishpi::SerialCommandReadBuffer target(mockSerial.get(),20);
+        phishpi::SerialMessageReadBuffer target(mockSerial.get(),20);
 
         When(Method(mockSerial,available)).Return(0);
 
@@ -21,7 +21,7 @@ namespace SerialCommandReadBufferTests {
 
     void givenCommandLongerThanBuffer_commandNotReturned() {
         Mock<phishpi::IMockableSerial> mockSerial;
-        phishpi::SerialCommandReadBuffer target(mockSerial.get(),3);
+        phishpi::SerialMessageReadBuffer target(mockSerial.get(),3);
 
         When(Method(mockSerial,available)).Return(6,5,4,3,2,1,0);
         When(Method(mockSerial,read)).Return('<','A','B','C','D','>');
@@ -33,7 +33,7 @@ namespace SerialCommandReadBufferTests {
 
     void givenCommandSameSizeAsBuffer_commandReturned() {
         Mock<phishpi::IMockableSerial> mockSerial;
-        phishpi::SerialCommandReadBuffer target(mockSerial.get(),4);
+        phishpi::SerialMessageReadBuffer target(mockSerial.get(),4);
 
         When(Method(mockSerial,available)).Return(6,5,4,3,2,1,0);
         When(Method(mockSerial,read)).Return('<','A','B','C','D','>');
@@ -45,7 +45,7 @@ namespace SerialCommandReadBufferTests {
 
     void givenSeveralAvailableWithoutMarkCharacters_thenReadCalled() {
         Mock<phishpi::IMockableSerial> mockSerial;
-        phishpi::SerialCommandReadBuffer target(mockSerial.get(),20);
+        phishpi::SerialMessageReadBuffer target(mockSerial.get(),20);
 
         When(Method(mockSerial,available)).Return(3,2,1,0);
         When(Method(mockSerial,read)).Return('A','B','C');
@@ -58,7 +58,7 @@ namespace SerialCommandReadBufferTests {
 
     void givenCommandAvailableSuroundedByJunk_thenCommandReturned() {
         Mock<phishpi::IMockableSerial> mockSerial;
-        phishpi::SerialCommandReadBuffer target(mockSerial.get(),20);
+        phishpi::SerialMessageReadBuffer target(mockSerial.get(),20);
 
         When(Method(mockSerial,available)).Return(7,6,5,4,3,2,1,0);
         When(Method(mockSerial,read)).Return('X','<','C','D','E','>','F');
@@ -70,7 +70,7 @@ namespace SerialCommandReadBufferTests {
 
     void givenTwoCommandAvailableSuroundedByJunk_thenFirstCommandReturned() {
         Mock<phishpi::IMockableSerial> mockSerial;
-        phishpi::SerialCommandReadBuffer target(mockSerial.get(),20);
+        phishpi::SerialMessageReadBuffer target(mockSerial.get(),20);
 
         When(Method(mockSerial,available)).Return(7,6,5,4,3,2,1,0);
         When(Method(mockSerial,read)).Return('X','<','C','>','<','D','>');
@@ -82,7 +82,7 @@ namespace SerialCommandReadBufferTests {
 
     void givenTwoCommandAvailableSuroundedByJunk_thenSecondCommandReturnedOnSecondInvocation() {
         Mock<phishpi::IMockableSerial> mockSerial;
-        phishpi::SerialCommandReadBuffer target(mockSerial.get(),20);
+        phishpi::SerialMessageReadBuffer target(mockSerial.get(),20);
 
         When(Method(mockSerial,available)).Return(7,6,5,4,3,2,1,0);
         When(Method(mockSerial,read)).Return('X','<','C','>','<','D','>');
@@ -95,7 +95,7 @@ namespace SerialCommandReadBufferTests {
 
     void givenHalfCommandAvailableOnFirstInvocationAndOtherHalfAvailableOnSecond_thenSecondInvocationReturnsCommand() {
         Mock<phishpi::IMockableSerial> mockSerial;
-        phishpi::SerialCommandReadBuffer target(mockSerial.get(),20);
+        phishpi::SerialMessageReadBuffer target(mockSerial.get(),20);
 
         When(Method(mockSerial,available)).Return(3,2,1,0);
         When(Method(mockSerial,read)).Return('<','C','D');

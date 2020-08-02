@@ -1,20 +1,20 @@
-#ifndef _SerialCommandReadBuffer_
-#define _SerialCommandReadBuffer_
+#ifndef _SerialMessageReadBuffer_
+#define _SerialMessageReadBuffer_
 #include "IMockableSerial.h"
 
 namespace phishpi {
-    class SerialCommandReadBuffer {
+    class SerialMessageReadBuffer {
         public:
-        SerialCommandReadBuffer(IMockableSerial& mockableSerial,unsigned char bufferSize) 
+
+        SerialMessageReadBuffer(IMockableSerial& mockableSerial,unsigned char bufferSize) 
             : mockableSerial(mockableSerial), 
             serialReadBuffer(new char[bufferSize+1]), 
-            bufferSize(bufferSize+1)
-        {
-        
-        }
-        ~SerialCommandReadBuffer() {
+            bufferSize(bufferSize+1) { }
+
+        ~SerialMessageReadBuffer() {
             delete serialReadBuffer;
         }
+        
         char * tryGetNextCommand() {
             while(mockableSerial.available() > 0) {
                 char singleByte = mockableSerial.read();
@@ -23,21 +23,16 @@ namespace phishpi {
                         serialReadBuffer[nextReadBufferIndex] = 0;
                         reset();
                         return serialReadBuffer;
-                    }
-                    else {
+                    } else {
                         if(nextReadBufferIndex < bufferSize - 1) {
                             serialReadBuffer[nextReadBufferIndex++] = singleByte;
-                        }
-                        else
-                        {
+                        } else {
                             reset();
                             return nullptr;
                         }
                         
                     }
-                }
-                else
-                {
+                } else {
                     if(singleByte == '<') {
                         inCommand = true;
                         nextReadBufferIndex = 0;

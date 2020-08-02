@@ -13,6 +13,15 @@ namespace phishpi {
         virtual int read() {
             return Serial.read();
         };
+
+        virtual size_t write(char * character,size_t count) {
+            return Serial.write(character,count);
+        };
+
+        virtual size_t availableForWrite() {
+            return Serial.availableForWrite();
+        };
+
     };
 }
 
