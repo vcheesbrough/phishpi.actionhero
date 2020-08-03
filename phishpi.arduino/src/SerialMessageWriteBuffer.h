@@ -6,8 +6,13 @@
 
 namespace phishpi {
     
+    class ISerialMessageSender {
+        public:
+        virtual void addMessage(const char * message) = 0;
+    };
+
     template <unsigned char TBufferSize>
-    class SerialMessageWriteBuffer {
+    class SerialMessageWriteBuffer :public phishpi::ISerialMessageSender {
         public:
         SerialMessageWriteBuffer(phishpi::IMockableSerial & serial,phishpi::IRingBuffer<char,TBufferSize> & ringBuffer) :
             serial(serial),

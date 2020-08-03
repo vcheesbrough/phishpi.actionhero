@@ -2,6 +2,10 @@
 #include "ArduinoSerial.h"
 #include "SerialMessageReadBuffer.h"
 #include "SerialMessageWriteBuffer.h"
+#include "TextMessageHandler.h"
+#include "MessageDispatcher.h"
+#include <array>
+#include <initializer_list>
 
 #define READ_BUFFER_SIZE  32
 #define WRITE_BUFFER_SIZE  100
@@ -11,42 +15,22 @@ phishpi::SerialMessageReadBuffer<READ_BUFFER_SIZE> serialMessageReadBuffer(ardui
 phishpi::RingBuffer<char,WRITE_BUFFER_SIZE> serialWriteRingBuffer;
 phishpi::SerialMessageWriteBuffer<WRITE_BUFFER_SIZE> serialMessageWriteBuffer(arduinoSerial,serialWriteRingBuffer);
 
+phishpi::TextMessageHandler textMessageHandler(serialMessageWriteBuffer);
+
+phishpi::MessageDispatcher messageDispatcher({
+  &textMessageHandler
+});
+
 void setup() {
   Serial.begin(115200);
-  serialMessageWriteBuffer.addMessage("Started");
-}
-
-void cStringToUpper(char * text) {
-  for(int i=0;text[i]!=0;i++)
-  if(text[i]<='z' && text[i]>='a')
-    text[i]-=32;
-}
-
-void dispatchCommand(char * command) {
-  cStringToUpper(command);
-  size_t commandLength = strlen(command);
-  if(commandLength >= 1) {
-    char * commandArguments = command+1;
-    switch (command[0]) 
-    {
-    case 'M':
-      Serial.print("M ");
-      Serial.println(commandArguments);
-      break;
-    
-    default:
-      Serial.print("ERROR ");
-      Serial.println(command);
-      break;
-    }
-  }
+  textMessageHandler.sendTextMessage("Started");
 }
 
 void loop() {
   serialMessageWriteBuffer.trySendMessages();
   char * command = serialMessageReadBuffer.tryGetNextCommand();
   if(command != nullptr) {
-    dispatchCommand(command);
+    messageDispatcher.dispatchRawMessage(command);
   }
 }
 
