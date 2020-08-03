@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x]
+        node-version: [0.19.0]
 
     steps:
     - uses: actions/checkout@v2
@@ -29,4 +29,4 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: jest
+    - run: node_modules/.bin/jest
