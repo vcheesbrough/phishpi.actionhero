@@ -30,7 +30,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: ls -l;pwd
-      working-directory: phishpi.node.js
     - run: npm install --prefix ./phishpi.node.js
     - run: ls -l;pwd
       working-directory: phishpi.node.js
