@@ -3,7 +3,7 @@
 #include "IMockableSerial.h"
 
 #ifndef ARDUINO
-#include "fakeit.h"
+#include <single_header/standalone/fakeit.hpp>
 using namespace fakeit;
 
 namespace SerialMessageReadBufferTests {
