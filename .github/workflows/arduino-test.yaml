@@ -34,5 +34,5 @@ jobs:
     - run: npm install --prefix ./phishpi.nodejs
     - run: ls -l;pwd
       working-directory: phishpi.nodejs
-    - run: node_modules/.bin/jest
+    - run: node_modules/.bin/jest --ci --coverage --verbose
       working-directory: phishpi.nodejs
