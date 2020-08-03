@@ -29,7 +29,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: ls -l;pwd
-    - run: npm install --save-dev jest
-      working-directory: phishpi.node.js
+#    - run: npm install --save-dev jest
+#      working-directory: phishpi.node.js
     - run: node_modules/.bin/jest
       working-directory: phishpi.node.js
