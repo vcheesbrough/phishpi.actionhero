@@ -1,0 +1,4 @@
+FROM actionhero/actionhero:v19.0.0
+EXPOSE 8080
+WORKDIR /actionhero
+COPY "*" foo/
