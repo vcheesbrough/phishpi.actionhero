@@ -1,6 +1,7 @@
 #include "SerialMessageReadBuffer.h"
 #include <unity.h>
 #include "IMockableSerial.h"
+#include "Constants.h"
 
 #ifndef ARDUINO
 #include <single_header/standalone/fakeit.hpp>
@@ -24,7 +25,7 @@ namespace SerialMessageReadBufferTests {
         phishpi::SerialMessageReadBuffer<3> target(mockSerial.get());
 
         When(Method(mockSerial,available)).Return(6,5,4,3,2,1,0);
-        When(Method(mockSerial,read)).Return('<','A','B','C','D','>');
+        When(Method(mockSerial,read)).Return(COMMAND_START_TOKEN,'A','B','C','D',COMMAND_END_TOKEN);
 
         char * nextCommand = target.tryGetNextCommand();
 
@@ -36,7 +37,7 @@ namespace SerialMessageReadBufferTests {
         phishpi::SerialMessageReadBuffer<4> target(mockSerial.get());
 
         When(Method(mockSerial,available)).Return(6,5,4,3,2,1,0);
-        When(Method(mockSerial,read)).Return('<','A','B','C','D','>');
+        When(Method(mockSerial,read)).Return(COMMAND_START_TOKEN,'A','B','C','D',COMMAND_END_TOKEN);
 
         char * nextCommand = target.tryGetNextCommand();
 
@@ -61,7 +62,7 @@ namespace SerialMessageReadBufferTests {
         phishpi::SerialMessageReadBuffer<20> target(mockSerial.get());
 
         When(Method(mockSerial,available)).Return(7,6,5,4,3,2,1,0);
-        When(Method(mockSerial,read)).Return('X','<','C','D','E','>','F');
+        When(Method(mockSerial,read)).Return('X',COMMAND_START_TOKEN,'C','D','E',COMMAND_END_TOKEN,'F');
 
         char* nextCommand = target.tryGetNextCommand();
 
@@ -73,7 +74,7 @@ namespace SerialMessageReadBufferTests {
         phishpi::SerialMessageReadBuffer<20> target(mockSerial.get());
 
         When(Method(mockSerial,available)).Return(7,6,5,4,3,2,1,0);
-        When(Method(mockSerial,read)).Return('X','<','C','>','<','D','>');
+        When(Method(mockSerial,read)).Return('X',COMMAND_START_TOKEN,'C',COMMAND_END_TOKEN,COMMAND_START_TOKEN,'D',COMMAND_END_TOKEN);
 
         char* nextCommand = target.tryGetNextCommand();
 
@@ -85,7 +86,7 @@ namespace SerialMessageReadBufferTests {
         phishpi::SerialMessageReadBuffer<20> target(mockSerial.get());
 
         When(Method(mockSerial,available)).Return(7,6,5,4,3,2,1,0);
-        When(Method(mockSerial,read)).Return('X','<','C','>','<','D','>');
+        When(Method(mockSerial,read)).Return('X',COMMAND_START_TOKEN,'C',COMMAND_END_TOKEN,COMMAND_START_TOKEN,'D',COMMAND_END_TOKEN);
 
         target.tryGetNextCommand();
         char* nextCommand = target.tryGetNextCommand();
@@ -98,12 +99,12 @@ namespace SerialMessageReadBufferTests {
         phishpi::SerialMessageReadBuffer<20> target(mockSerial.get());
 
         When(Method(mockSerial,available)).Return(3,2,1,0);
-        When(Method(mockSerial,read)).Return('<','C','D');
+        When(Method(mockSerial,read)).Return(COMMAND_START_TOKEN,'C','D');
 
         target.tryGetNextCommand();
 
         When(Method(mockSerial,available)).Return(3,2,1,0);
-        When(Method(mockSerial,read)).Return('E','F','>');
+        When(Method(mockSerial,read)).Return('E','F',COMMAND_END_TOKEN);
 
         char* nextCommand = target.tryGetNextCommand();
 

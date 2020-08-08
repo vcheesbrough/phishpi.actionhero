@@ -1,0 +1,6 @@
+#pragma once
+
+#define COMMAND_START_TOKEN '['
+#define COMMAND_START_TOKEN_STRING "["
+#define COMMAND_END_TOKEN ']'
+#define COMMAND_END_TOKEN_STRING "]"

@@ -13,7 +13,7 @@ namespace phishpi {
         }
 
         virtual char messageTypeIdentifier() {
-            return 'T';
+            return 't';
         };
 
         virtual void handleMessage(char * messageParameters) {
@@ -22,7 +22,7 @@ namespace phishpi {
 
         void sendTextMessage(const char * textMessage) {
             size_t length = strlen(textMessage);
-            char outboundMessage[length+2] = "T:";
+            char outboundMessage[length+2] = "t:";
             memcpy(outboundMessage+2,textMessage,length+1);
 
             messageSender.addMessage(outboundMessage);
