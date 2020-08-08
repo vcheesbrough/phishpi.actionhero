@@ -16,7 +16,6 @@ namespace phishpi
 
         void dispatchRawMessage(char * message) {
             size_t messageLength = strlen(message);
-            cStringToUpper(message);
             if(messageLength >= 2) {
                 if(message[1] == ':') {
                     char messageType = message[0];
@@ -31,12 +30,6 @@ namespace phishpi
 
         private:
         std::vector<phishpi::InboundMessageHandler*> handlers;
-        void cStringToUpper(char * text) {
-            for(int i=0;text[i]!=0;i++)
-                if(text[i]<='z' && text[i]>='a')
-                    text[i]-=32;
-        }
-
     };
 } 
 

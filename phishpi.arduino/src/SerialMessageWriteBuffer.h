@@ -3,6 +3,7 @@
 #include "IMockableSerial.h"
 #include "IRingBuffer.h"
 #include <string.h>
+#include "Constants.h"
 
 namespace phishpi {
     
@@ -23,9 +24,9 @@ namespace phishpi {
         void addMessage(const char * message) {
             size_t charactersInMessage = strlen(message);
             if(charactersInMessage + 2 < ringBuffer.availableForPut()) {
-                ringBuffer.put("<",1);
+                ringBuffer.put(COMMAND_START_TOKEN_STRING,1);
                 ringBuffer.put(message,charactersInMessage);
-                ringBuffer.put(">",1);
+                ringBuffer.put(COMMAND_END_TOKEN_STRING,1);
             }
         }
 

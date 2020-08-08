@@ -1,6 +1,6 @@
-#ifndef _SerialMessageReadBuffer_
-#define _SerialMessageReadBuffer_
+#pragma once
 #include "IMockableSerial.h"
+#include "Constants.h"
 
 namespace phishpi {
     template <unsigned char TBufferSize>
@@ -14,7 +14,7 @@ namespace phishpi {
             while(mockableSerial.available() > 0) {
                 char singleByte = mockableSerial.read();
                 if(inCommand) {
-                    if(singleByte == '>') {
+                    if(singleByte == COMMAND_END_TOKEN) {
                         serialReadBuffer[nextReadBufferIndex] = 0;
                         reset();
                         return serialReadBuffer;
@@ -28,7 +28,7 @@ namespace phishpi {
                         
                     }
                 } else {
-                    if(singleByte == '<') {
+                    if(singleByte == COMMAND_START_TOKEN) {
                         inCommand = true;
                         nextReadBufferIndex = 0;
                     }
@@ -51,4 +51,3 @@ namespace phishpi {
 
     };
 }
-#endif

@@ -21,7 +21,6 @@ namespace phishpi {
         virtual size_t availableForWrite() {
             return Serial.availableForWrite();
         };
-
     };
 }
 
